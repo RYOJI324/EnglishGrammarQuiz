@@ -1918,8 +1918,45 @@
 
       .arena {
         grid-template-columns: 1fr 0.75fr 1fr;
-        min-height: 160px;
-        padding: 14px 8px;
+        min-height: 138px;
+        padding: 8px 6px;
+      }
+
+      .hero-character {
+        width: clamp(100px, 24vw, 128px);
+        height: clamp(118px, 29vw, 150px);
+      }
+
+      .boss-monster {
+        width: clamp(82px, 20vw, 108px);
+        height: clamp(86px, 21vw, 116px);
+      }
+
+      .boss-question {
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .boss-sentence {
+        padding: 10px;
+        font-size: clamp(1.28rem, 6vw, 2rem);
+      }
+
+      .boss-choices {
+        gap: 8px;
+      }
+
+      .boss-choices .choice-button,
+      .boss-choices .action-button {
+        min-height: 46px;
+        padding: 9px 10px;
+      }
+
+      .boss-message {
+        min-height: 44px;
+        max-height: none;
+        padding: 7px 10px;
+        font-size: clamp(0.82rem, 3.3vw, 1rem);
       }
 
       .boss-choices {
@@ -1943,6 +1980,67 @@
 
       .sentence {
         padding: 16px 10px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 820px) {
+      .app {
+        gap: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      .boss-card {
+        gap: 8px;
+        padding: clamp(10px, 1.6vw, 16px);
+      }
+
+      .boss-tools,
+      .battle-options {
+        gap: 8px;
+      }
+
+      .arena {
+        min-height: 128px;
+        padding: 8px;
+      }
+
+      .hero-character {
+        width: clamp(96px, 14vw, 138px);
+        height: clamp(112px, 17vw, 160px);
+      }
+
+      .boss-monster {
+        width: clamp(88px, 13vw, 128px);
+        height: clamp(92px, 14vw, 136px);
+      }
+
+      .boss-question {
+        gap: 7px;
+        padding: 9px 12px;
+      }
+
+      .boss-sentence {
+        padding: 9px;
+        font-size: clamp(1.22rem, 3vw, 1.9rem);
+      }
+
+      .boss-choices {
+        gap: 7px;
+      }
+
+      .boss-choices .choice-button,
+      .boss-choices .action-button {
+        min-height: 42px;
+        padding: 7px 10px;
+      }
+
+      .boss-message {
+        min-height: 42px;
+        max-height: none;
+        margin-top: 0;
+        padding: 7px 10px;
+        font-size: clamp(0.82rem, 1.8vw, 0.98rem);
       }
     }
 
@@ -2036,7 +2134,7 @@
         <button class="level-button" data-level="2">レベル2：コウモリ</button>
         <button class="level-button" data-level="3">レベル3：ゴーレム</button>
         <button class="level-button" data-level="4">レベル4：ドラゴン</button>
-        <button class="level-button" data-level="5">レベル5：a/an</button>
+        <button class="level-button" data-level="5">レベル5：ゾンビ</button>
         <button class="level-button" data-level="6">レベル6：大王</button>
         <button class="mode-button" id="bossModeButton" type="button">れんしゅう</button>
       </nav>
@@ -2205,7 +2303,7 @@
       2: "レベル2：疑問文",
       3: "レベル3：答え方",
       4: "レベル4：音読",
-      5: "レベル5：a/an 複数形",
+      5: "レベル5：単数複数ゾンビ",
       6: "レベル6：ごちゃまぜ"
     };
 
@@ -2475,17 +2573,6 @@
         explanation: "these は2つ以上なので Are を使います。"
       },
       {
-        id: "l2-am-i-happy",
-        level: 2,
-        type: "choice",
-        questionText: "疑問文のはじめを選ぼう",
-        sentenceHtml: "___ I happy?",
-        japaneseMeaning: "わたしは うれしいですか。",
-        choices: ["Am", "Are", "Is"],
-        answer: "Am",
-        explanation: "I の質問は Am を文のはじめに出します。"
-      },
-      {
         id: "l2-are-you-happy",
         level: 2,
         type: "choice",
@@ -2528,17 +2615,6 @@
         choices: ["Am", "Are", "Is"],
         answer: "Are",
         explanation: "they は are と仲よし。文のはじめなので Are です。"
-      },
-      {
-        id: "l2-am-i-student",
-        level: 2,
-        type: "choice",
-        questionText: "疑問文のはじめを選ぼう",
-        sentenceHtml: "___ I a student?",
-        japaneseMeaning: "わたしは 生徒ですか。",
-        choices: ["Am", "Are", "Is"],
-        answer: "Am",
-        explanation: "I は am と仲よし。文のはじめなので Am です。"
       },
       {
         id: "l2-are-you-friend",
@@ -2649,28 +2725,6 @@
         choices: ["isn’t", "aren’t", "is", "are"],
         answer: "aren’t",
         explanation: "these は2つ以上なので、答えでは they を使います。"
-      },
-      {
-        id: "l3-yes-i-am",
-        level: 3,
-        type: "choice",
-        questionText: "Yes の答え方を選ぼう",
-        sentenceHtml: "Am I happy?<br>Yes, ___ ___.",
-        japaneseMeaning: "わたしは うれしいですか。はい、そうです。",
-        choices: ["I am", "he is", "she is", "they are"],
-        answer: "I am",
-        explanation: "I は am と仲よし。Yes なら I am です。"
-      },
-      {
-        id: "l3-no-i-am-not",
-        level: 3,
-        type: "choice",
-        questionText: "No の答え方を選ぼう",
-        sentenceHtml: "Am I happy?<br>No, ___ ___.",
-        japaneseMeaning: "わたしは うれしいですか。いいえ、ちがいます。",
-        choices: ["I’m not", "he isn’t", "she isn’t", "they aren’t"],
-        answer: "I’m not",
-        explanation: "Am I の No は I’m not です。"
       },
       {
         id: "l3-yes-you-are",
@@ -2831,16 +2885,6 @@
         japaneseMeaning: "これらは ペンですか。",
         modelAnswers: ["Yes, they are.", "No, they aren’t."],
         explanation: "these は2つ以上なので、they are / they aren’t で答えます。"
-      },
-      {
-        id: "l4-am-i-happy",
-        level: 4,
-        type: "speaking",
-        questionText: "こえに出して答えよう",
-        sentenceHtml: "Am I happy?",
-        japaneseMeaning: "わたしは うれしいですか。",
-        modelAnswers: ["Yes, I am.", "No, I’m not."],
-        explanation: "I は am と仲よし。No は I’m not です。"
       },
       {
         id: "l4-are-you-happy",
@@ -3161,16 +3205,6 @@
         explanation: "those の質問も they で答えます。"
       },
       {
-        id: "l5-ask-i",
-        level: 6,
-        type: "speaking",
-        questionText: "まぜまぜ音読",
-        sentenceHtml: "Am I happy?",
-        japaneseMeaning: "わたしは うれしいですか。",
-        modelAnswers: ["Yes, I am.", "No, I’m not."],
-        explanation: "I は am と仲よし。"
-      },
-      {
         id: "l5-ask-you",
         level: 6,
         type: "speaking",
@@ -3212,6 +3246,91 @@
       }
     ];
 
+    const adjectiveWords = [
+      { word: "sad", jp: "かなしい" },
+      { word: "hungry", jp: "おなかがすいている" },
+      { word: "angry", jp: "おこっている" },
+      { word: "tired", jp: "つかれている" },
+      { word: "good", jp: "元気な" }
+    ];
+
+    const adjectiveSubjects = [
+      { key: "you", subject: "You", questionSubject: "you", be: "are", startBe: "Are", yes: "I am", no: "I’m not", noPrompt: "___ ___", jp: "あなた" },
+      { key: "he", subject: "He", questionSubject: "he", be: "is", startBe: "Is", yes: "he is", no: "isn’t", noPrompt: "he ___", jp: "かれ" },
+      { key: "she", subject: "She", questionSubject: "she", be: "is", startBe: "Is", yes: "she is", no: "isn’t", noPrompt: "she ___", jp: "かのじょ" },
+      { key: "they", subject: "They", questionSubject: "they", be: "are", startBe: "Are", yes: "they are", no: "aren’t", noPrompt: "they ___", jp: "かれら" }
+    ];
+
+    adjectiveWords.forEach(({ word, jp }) => {
+      questions.push({
+        id: `l1-i-am-${word}`,
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: `I ___ ${word}.`,
+        japaneseMeaning: `わたしは ${jp}です。`,
+        choices: ["am", "are", "is"],
+        answer: "am",
+        explanation: "I は am と仲よし。"
+      });
+      adjectiveSubjects.forEach((item) => {
+        questions.push({
+          id: `l1-${item.key}-${item.be}-${word}`,
+          level: 1,
+          type: "choice",
+          questionText: "空らんに入る言葉を選ぼう",
+          sentenceHtml: `${item.subject} ___ ${word}.`,
+          japaneseMeaning: `${item.jp}は ${jp}です。`,
+          choices: ["am", "are", "is"],
+          answer: item.be,
+          explanation: `${item.questionSubject} は ${item.be} と仲よし。`
+        });
+        questions.push({
+          id: `l2-${item.startBe.toLowerCase()}-${item.key}-${word}`,
+          level: 2,
+          type: "choice",
+          questionText: "疑問文のはじめを選ぼう",
+          sentenceHtml: `___ ${item.questionSubject} ${word}?`,
+          japaneseMeaning: `${item.jp}は ${jp}ですか。`,
+          choices: ["Am", "Are", "Is"],
+          answer: item.startBe,
+          explanation: `${item.questionSubject} は ${item.be} と仲よし。疑問文では ${item.startBe} を前に出します。`
+        });
+        questions.push({
+          id: `l3-yes-${item.key}-${word}`,
+          level: 3,
+          type: "choice",
+          questionText: "Yes の答え方を選ぼう",
+          sentenceHtml: `${item.startBe} ${item.questionSubject} ${word}?<br>Yes, ___ ___.`,
+          japaneseMeaning: `${item.jp}は ${jp}ですか。はい、そうです。`,
+          choices: [item.yes, item.key === "you" ? "you are" : "it is", item.be === "are" ? "it is" : "they are"],
+          answer: item.yes,
+          explanation: item.key === "you" ? "you で聞かれたら、答える人は「私」なので Yes, I am. です。" : `${item.questionSubject} の Yes は ${item.yes} で答えます。`
+        });
+        questions.push({
+          id: `l3-no-${item.key}-${word}`,
+          level: 3,
+          type: "choice",
+          questionText: "No の答え方を選ぼう",
+          sentenceHtml: `${item.startBe} ${item.questionSubject} ${word}?<br>No, ${item.noPrompt}.`,
+          japaneseMeaning: `${item.jp}は ${jp}ですか。いいえ、ちがいます。`,
+          choices: [item.no, item.key === "you" ? "you aren’t" : "aren’t", "isn’t"],
+          answer: item.no,
+          explanation: item.key === "you" ? "Are you ...? は聞かれた人が答えるので、No, I’m not. です。" : `No のときは ${item.no} を使います。`
+        });
+        questions.push({
+          id: `l4-${item.startBe.toLowerCase()}-${item.key}-${word}`,
+          level: 4,
+          type: "speaking",
+          questionText: "こえに出して答えよう",
+          sentenceHtml: `${item.startBe} ${item.questionSubject} ${word}?`,
+          japaneseMeaning: `${item.jp}は ${jp}ですか。`,
+          modelAnswers: item.key === "you" ? ["Yes, I am.", "No, I’m not."] : [`Yes, ${item.yes}.`, `No, ${item.key} ${item.no}.`],
+          explanation: item.key === "you" ? "Are you ...? は Yes, I am. / No, I’m not. で答えます。" : `${item.questionSubject} は ${item.be} と仲よし。Yes / No で答えます。`
+        });
+      });
+    });
+
     const state = {
       currentLevel: 1,
       round: [],
@@ -3242,6 +3361,7 @@
         { name: "You are 水筒スプラッシュ", type: "waterBottleSplash" },
         { name: "They are なわとびぐるぐる", type: "jumpRopeSpin" },
         { name: "He is チョークミサイル", type: "chalkMissile" },
+        { name: "He is フライングパンツ", type: "shoeDash" },
         { name: "She is 連絡帳フラッシュ", type: "notebookFlash" },
         { name: "This is お道具箱バースト", type: "print" },
         { name: "I am えんぴつけずりタイフーン", type: "pencilRocket" },
@@ -3251,17 +3371,13 @@
         { name: "Are you トルネードそうじ", type: "broom" },
         { name: "Is he サンダーボルト消しゴム", type: "eraser" },
         { name: "Is she ムーンライトビーム", type: "print" },
-        { name: "Are they 洗濯ぐるぐる", type: "washer" },
-        { name: "Am I ミラクルパンチ", type: "bagPush" },
-        { name: "Are you 前出しキック", type: "car" },
+        { name: "Are they 洗濯ぐるぐる", type: "washer" },        { name: "Are you 前出しキック", type: "car" },
         { name: "Are they ひっくり返しアタック", type: "washer" },
         { name: "Is this ブーメラン", type: "broom" },
         { name: "Are you トルネード", type: "broom" },
         { name: "Is he 黒板消しダイブ", type: "eraserRoller" },
         { name: "Is she チョークスプラッシュ", type: "chalkMissile" },
-        { name: "Are they うわばきハリケーン", type: "shoeDash" },
-        { name: "Am I えんぴつドリル", type: "pencilRocket" },
-        { name: "Is this ぞうきんスラッシュ", type: "broom" },
+        { name: "Are they うわばきハリケーン", type: "shoeDash" },        { name: "Is this ぞうきんスラッシュ", type: "broom" },
         { name: "Is that ちりとりキャノン", type: "dustpanPusun" },
         { name: "Are these 定規カッター", type: "rulerSlash" },
         { name: "Are those 分度器ブーメラン", type: "rulerSlash" },
@@ -3269,9 +3385,7 @@
         { name: "Are you ランドセルアタック", type: "bagPush" },
         { name: "Are you 給食トレー返し", type: "trayCannon" },
         { name: "Is this お道具箱オープン", type: "print" },
-        { name: "Are those プリント雪崩", type: "print" },
-        { name: "Am I 名札フラッシュ", type: "notebookFlash" }
-      ],
+        { name: "Are those プリント雪崩", type: "print" },      ],
       level3: [
         { name: "Yes, I am おそうじハリケーン", type: "broom" },
         { name: "No, I’m not 脱水スピン", type: "washer" },
@@ -3362,6 +3476,7 @@
         { name: "It is 見分けアタック", type: "bagPush" },
         { name: "These are りんごミサイル", type: "car" },
         { name: "Are you トルネード", type: "broom" },
+        { name: "Are you うんち", type: "poopAvoid" },
         { name: "This is ぞうきんスラッシュ", type: "broom" },
         { name: "They are うわばきダッシュ", type: "shoeDash" },
         { name: "Yes, I am えんぴつビーム", type: "pencilRocket" },
@@ -3414,10 +3529,10 @@
         specials: specialMoves.level4
       },
       5: {
-        name: "a/an 複数形モンスター",
+        name: "単数複数ゾンビ",
         className: "level-5",
         label: "レベル5",
-        subtitle: "1つ・2つ以上・a / an / my / your を見分けよう！",
+        subtitle: "1つ・2つ以上をまちがえさせるゾンビを倒そう！",
         specials: specialMoves.level5
       },
       6: {
@@ -3439,7 +3554,8 @@
       specialName: "",
       specialType: "broom",
       customBossFace: false,
-      autoTimer: null
+      autoTimer: null,
+      effectTimers: []
     };
 
     const ULTIMATE_CHARGE_TIME = 1200;
@@ -3540,6 +3656,20 @@
       return copy;
     }
 
+    function scheduleBattleEffect(callback, delay) {
+      const timer = window.setTimeout(() => {
+        bossBattleState.effectTimers = bossBattleState.effectTimers.filter((id) => id !== timer);
+        callback();
+      }, delay);
+      bossBattleState.effectTimers.push(timer);
+      return timer;
+    }
+
+    function clearBattleEffectTimers() {
+      bossBattleState.effectTimers.forEach((timer) => window.clearTimeout(timer));
+      bossBattleState.effectTimers = [];
+    }
+
     function makeRound(level) {
       const levelQuestions = questions.filter((question) => question.level === level);
       const weakSet = new Set(state.weakIds);
@@ -3633,7 +3763,7 @@
 
     function renderChoices(question) {
       els.choices.classList.remove("hidden");
-      shuffle(question.choices).forEach((choice) => {
+      shuffle([...new Set(question.choices)]).forEach((choice) => {
         const button = document.createElement("button");
         button.className = "choice-button";
         button.type = "button";
@@ -3770,29 +3900,17 @@
     }
 
     function makeStageRound(level) {
-      const level5Ids = [
-        "l5-aan-this-pen", "l5-aan-this-apple", "l5-aan-that-egg", "l5-aan-that-book",
-        "l5-none-these-pens", "l5-none-those-apples", "l5-none-this-my-pen", "l5-none-this-your-book",
-        "l5-none-these-my-pens", "l5-none-those-your-books", "l5-noun-these-pens", "l5-noun-this-a-pen",
-        "l5-noun-those-apples", "l5-noun-that-an-apple", "l5-poss-this-my-pen", "l5-poss-these-my-pens",
-        "l5-poss-that-your-book", "l5-poss-those-your-books"
-      ];
-      const levelPools = {
-        1: ["l1-i-am-happy", "l1-you-are-happy", "l1-he-is-happy", "l1-she-is-happy", "l1-they-are-happy", "l1-this-is-pencil", "l1-that-is-desk", "l1-these-are-apples", "l1-those-are-books"],
-        2: ["l2-am-i-happy", "l2-are-you-happy", "l2-is-he-happy", "l2-is-she-happy", "l2-are-they-happy", "l2-is-this-pencil", "l2-is-that-desk", "l2-are-these-apples", "l2-are-those-books"],
-        3: ["l3-yes-i-am", "l3-no-i-am-not", "l3-yes-you-are", "l3-no-you-arent", "l3-yes-you-friend-i-am", "l3-no-you-friend-im-not", "l3-yes-he-is", "l3-no-he-isnt", "l3-yes-she-is", "l3-no-she-isnt", "l3-yes-they-are-happy", "l3-no-they-arent-happy", "l3-yes-it-is", "l3-no-it-isnt", "l3-yes-they-are", "l3-no-these-they"],
-        4: ["l4-am-i-happy", "l4-are-you-happy", "l4-is-he-happy", "l4-is-she-happy", "l4-are-they-happy", "l4-this-pencil", "l4-these-apples"],
-        5: level5Ids,
-        6: ["l1-they-are-students", "l2-are-they-students", "l3-yes-you-are", "l3-no-you-arent", "l3-no-they-arent-happy", "l3-yes-they-are", "l4-are-you-happy", "l4-are-they-happy", "l5-ask-you", "l5-ask-these", "l5-ask-they", "l1-this-is-pencil", "l2-is-she-sister", "l3-yes-it-is", ...level5Ids]
-      };
-      const pool = (levelPools[level] || levelPools[1])
-        .map((id) => questions.find((question) => question.id === id))
-        .filter(Boolean);
+      const pool = questions.filter((question) => (
+        level === 6
+          ? question.level >= 1 && question.level <= 6
+          : question.level === level
+      ));
       return shuffle(pool).slice(0, 5);
     }
 
     function startBossBattle(level = state.currentLevel || 1) {
       window.clearTimeout(bossBattleState.autoTimer);
+      clearBattleEffectTimers();
       state.currentLevel = level;
       bossBattleState.round = makeStageRound(level);
       bossBattleState.index = 0;
@@ -3893,6 +4011,7 @@
       setHeroPose("idle");
       const question = currentBossQuestion();
       bossBattleState.answered = false;
+      els.specialGaugeFill.classList.remove("fizzle", "charge");
       els.bossQuestionCounter.textContent = `${bossBattleState.index + 1} / ${bossBattleState.round.length} 問`;
       els.bossScoreCounter.textContent = `正解 ${bossBattleState.score}`;
       updateSpecialGauge();
@@ -3909,7 +4028,7 @@
         renderStageSpeaking(question);
         return;
       }
-      shuffle(question.choices).forEach((choice) => {
+      shuffle([...new Set(question.choices)]).forEach((choice) => {
         const button = document.createElement("button");
         button.className = "choice-button";
         button.type = "button";
@@ -4032,8 +4151,8 @@
       window.clearTimeout(bossBattleState.autoTimer);
       if (bossBattleState.index < bossBattleState.round.length - 1) {
         bossBattleState.index += 1;
-        scrollBossIntoView();
         renderBossQuestion();
+        scrollQuestionIntoView();
       } else {
         finishBossBattle();
       }
@@ -4041,6 +4160,7 @@
 
     function updateSpecialGauge() {
       const percent = bossBattleState.score * 20;
+      els.specialGaugeFill.classList.remove("fizzle");
       els.specialGaugeText.textContent = `必殺技ゲージ ${percent}%`;
       els.specialGaugeFill.style.width = `${percent}%`;
       els.specialGaugeFill.classList.toggle("max", percent === 100);
@@ -4068,6 +4188,7 @@
 
     function finishBossBattle() {
       window.clearTimeout(bossBattleState.autoTimer);
+      clearBattleEffectTimers();
       bossBattleState.finished = true;
       els.bossQuestionCounter.textContent = `${bossBattleState.round.length} / ${bossBattleState.round.length} 問`;
       els.bossQuestionBox.classList.add("hidden");
@@ -4118,7 +4239,7 @@
       setBossExplanationMessage("neutral", "光がゆっくり集まっているよ……");
       playBattleEffect(els.bossBattleCard, "flash");
       playSound("special");
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         resetBattleEffect(els.heroCharacter, "ultimate-charging");
         setHeroAuraLevel(0);
         setHeroPose("victory");
@@ -4127,10 +4248,10 @@
         playBattleEffect(els.ultimateBeamImage, "fire");
         playUltimateByType(bossBattleState.specialType);
       }, chargeTime);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         playEnemyDefeat();
       }, chargeTime + attackTime);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         setHeroPose("victory");
         setBossExplanationMessage("correct", "勝利！全問正解！");
       }, chargeTime + attackTime + defeatTime);
@@ -4174,7 +4295,7 @@
       prop.className = `ultimate-prop ${type}`;
       prop.textContent = label;
       els.particleLayer.appendChild(prop);
-      setTimeout(() => prop.remove(), ULTIMATE_ATTACK_TIME + 240);
+      scheduleBattleEffect(() => prop.remove(), ULTIMATE_ATTACK_TIME + 240);
     }
 
     function playPusunFail() {
@@ -4187,36 +4308,36 @@
       playBattleEffect(els.heroCharacter, "ready");
       playBattleEffect(els.specialGaugeFill, "charge");
       playBattleEffect(els.bossBattleCard, "flash");
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         els.bossFinalCall.textContent = `${bossBattleState.specialName.slice(0, Math.max(5, Math.floor(bossBattleState.specialName.length / 2)))}……？`;
         setBossExplanationMessage("neutral", "……あれ？");
       }, short ? 180 : 700);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         playBattleEffect(els.specialGaugeFill, "fizzle");
         setHeroPose("sad");
         setBossExplanationMessage("neutral", "ゲージがしゅん……");
       }, short ? 360 : 1300);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         playBattleEffect(els.bossSmoke, "puff");
         playBattleEffect(els.puffText, "show");
         spawnPusunSmoke();
         playSound("fizzle");
       }, short ? 520 : 1800);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         setBossExplanationMessage("wrong", "プスン……");
         setHeroPose("sad");
         playBattleEffect(els.heroCharacter, "sad");
       }, short ? 700 : 2300);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         playBattleEffect(els.bossMonster, "gloated");
         spawnWrongBurst("あと少し！");
         setBossExplanationMessage("wrong", "敵がニヤリ！");
       }, short ? 860 : 2800);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         playBattleEffect(els.bossMonster, "boss-counter");
         setBossExplanationMessage("wrong", "ボスのコミカル反撃！");
       }, short ? 1000 : 3250);
-      setTimeout(() => {
+      scheduleBattleEffect(() => {
         playHeroDefeat();
         setBossExplanationMessage("wrong", "プスン…… あと少し！もう一回チャレンジ！");
       }, short ? 1200 : 3800);
@@ -4345,6 +4466,12 @@
 
     function scrollBossIntoView() {
       els.bossBattleCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function scrollQuestionIntoView() {
+      const isCompact = window.matchMedia("(max-width: 760px), (orientation: landscape) and (max-height: 820px)").matches;
+      const target = isCompact ? els.bossQuestionBox : els.bossBattleCard;
+      target.scrollIntoView({ behavior: "smooth", block: isCompact ? "center" : "nearest" });
     }
 
     function playSound(type) {
