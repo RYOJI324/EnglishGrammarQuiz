@@ -1,0 +1,4561 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>えいご これ・あれ クイズ</title>
+  <style>
+    :root {
+      --bg: #fff7df;
+      --card: #ffffff;
+      --ink: #243047;
+      --muted: #657089;
+      --blue: #4f7cff;
+      --blue-dark: #315ad8;
+      --green: #1c9b63;
+      --green-soft: #dff8eb;
+      --red: #d84b4b;
+      --red-soft: #ffe2e2;
+      --yellow: #ffd66b;
+      --orange: #ff9f45;
+      --line: #e6dfca;
+      --shadow: 0 18px 40px rgba(47, 60, 95, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 214, 107, 0.36), transparent 34%),
+        linear-gradient(135deg, #fff7df 0%, #e7f5ff 48%, #f1ffe9 100%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1040px, 100%);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 3.1rem);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      font-weight: 700;
+    }
+
+    .level-badge {
+      padding: 12px 18px;
+      border: 3px solid #243047;
+      border-radius: 999px;
+      background: var(--yellow);
+      font-size: 1.05rem;
+      font-weight: 900;
+      box-shadow: 4px 4px 0 #243047;
+    }
+
+    .level-nav {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .level-button,
+    .mode-button,
+    .choice-button,
+    .action-button {
+      min-height: 54px;
+      border: 0;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--ink);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .level-button {
+      padding: 10px;
+      background: #ffffff;
+      border: 2px solid var(--line);
+      font-size: 0.98rem;
+    }
+
+    .mode-button {
+      padding: 10px;
+      color: #ffffff;
+      background: #7b4df3;
+      border: 2px solid #5430b8;
+      font-size: 0.98rem;
+    }
+
+    .level-button.active {
+      color: #ffffff;
+      background: var(--blue);
+      border-color: var(--blue-dark);
+      box-shadow: 0 8px 0 var(--blue-dark);
+      transform: translateY(-2px);
+    }
+
+    .mode-button.active {
+      box-shadow: 0 8px 0 #5430b8;
+      transform: translateY(-2px);
+    }
+
+    .level-button:focus-visible,
+    .mode-button:focus-visible,
+    .choice-button:focus-visible,
+    .action-button:focus-visible {
+      outline: 4px solid var(--orange);
+      outline-offset: 3px;
+    }
+
+    main {
+      display: grid;
+      gap: 18px;
+    }
+
+    .status-card,
+    .quiz-card,
+    .result-card {
+      background: rgba(255, 255, 255, 0.94);
+      border: 3px solid #243047;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .status-card {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      font-size: clamp(1rem, 2.4vw, 1.2rem);
+      font-weight: 900;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #f4f7ff;
+      border: 2px solid #d8e0ff;
+    }
+
+    .progress {
+      height: 20px;
+      border-radius: 999px;
+      background: #ece6d3;
+      overflow: hidden;
+      border: 2px solid #243047;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--green), #67d477);
+      transition: width 0.25s ease;
+    }
+
+    .quiz-card {
+      padding: clamp(18px, 4vw, 34px);
+      display: grid;
+      gap: 20px;
+    }
+
+    .question-type {
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: clamp(1.15rem, 3vw, 1.5rem);
+      font-weight: 900;
+    }
+
+    .japanese {
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2.7vw, 1.35rem);
+      font-weight: 800;
+    }
+
+    .sentence {
+      margin: 0;
+      padding: 20px;
+      border-radius: 18px;
+      background: #f8fbff;
+      border: 3px dashed #9eb5ff;
+      font-size: clamp(2rem, 7vw, 4rem);
+      line-height: 1.18;
+      font-weight: 950;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .choice-button {
+      padding: 18px 16px;
+      background: #ffffff;
+      border: 3px solid #243047;
+      box-shadow: 0 7px 0 #243047;
+      font-size: clamp(1.35rem, 4vw, 2rem);
+    }
+
+    .choice-button:hover:not(:disabled),
+    .action-button:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    .choice-button:disabled,
+    .action-button:disabled {
+      cursor: default;
+      opacity: 0.86;
+    }
+
+    .choice-button.correct {
+      background: var(--green-soft);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .choice-button.wrong {
+      background: var(--red-soft);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .feedback {
+      display: none;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: clamp(1.1rem, 3vw, 1.35rem);
+      font-weight: 900;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.ok {
+      background: var(--green-soft);
+      border: 3px solid var(--green);
+      color: var(--green);
+    }
+
+    .feedback.no {
+      background: var(--red-soft);
+      border: 3px solid var(--red);
+      color: var(--red);
+    }
+
+    .explanation {
+      display: none;
+      margin: 0;
+      color: var(--ink);
+      background: #fff8db;
+      border-left: 8px solid var(--orange);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: clamp(1rem, 2.6vw, 1.2rem);
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
+    .explanation.show {
+      display: block;
+    }
+
+    .model-answer {
+      display: none;
+      padding: 18px;
+      border-radius: 18px;
+      background: #eefbf2;
+      border: 3px solid var(--green);
+      font-size: clamp(1.45rem, 4vw, 2.4rem);
+      line-height: 1.35;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .model-answer.show {
+      display: block;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .action-button {
+      flex: 1 1 180px;
+      padding: 16px 18px;
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 7px 0 var(--blue-dark);
+      font-size: clamp(1.1rem, 3vw, 1.45rem);
+    }
+
+    .action-button.success {
+      background: var(--green);
+      box-shadow: 0 7px 0 #0f7447;
+    }
+
+    .action-button.retry {
+      background: var(--orange);
+      box-shadow: 0 7px 0 #c56c21;
+    }
+
+    .action-button.light {
+      color: var(--ink);
+      background: #ffffff;
+      border: 3px solid #243047;
+      box-shadow: 0 7px 0 #243047;
+    }
+
+    .result-card {
+      display: none;
+      padding: clamp(20px, 5vw, 36px);
+      text-align: center;
+    }
+
+    .result-card.show {
+      display: grid;
+      gap: 16px;
+    }
+
+    .result-title {
+      margin: 0;
+      font-size: clamp(1.8rem, 6vw, 3rem);
+      line-height: 1.2;
+    }
+
+    .result-score {
+      margin: 0;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 950;
+    }
+
+    .summary-card {
+      padding: clamp(16px, 4vw, 24px);
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary-title {
+      margin: 0;
+      font-size: clamp(1.25rem, 3.4vw, 1.65rem);
+      font-weight: 950;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .summary-item {
+      min-height: 52px;
+      padding: 10px 12px;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .boss-card {
+      padding: clamp(16px, 4vw, 28px);
+      display: grid;
+      gap: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(242, 248, 255, 0.95)),
+        #ffffff;
+      border: 3px solid #243047;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .boss-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .boss-title {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2.35rem);
+      font-weight: 950;
+      line-height: 1.1;
+    }
+
+    .photo-upload {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 10px 14px;
+      border: 3px solid #243047;
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 5px 0 #243047;
+      cursor: pointer;
+      font-weight: 950;
+    }
+
+    .photo-upload input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .arena {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) minmax(150px, 0.85fr);
+      align-items: end;
+      gap: clamp(18px, 5vw, 42px);
+      min-height: 260px;
+      padding: 18px;
+      border: 3px dashed #9eb5ff;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, #eaf6ff 0%, #f7ffeb 68%, #dff2c9 68%, #dff2c9 100%);
+    }
+
+    .beam {
+      position: absolute;
+      left: 29%;
+      right: 28%;
+      top: 42%;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #fff36d, #66e8ff, #ffffff);
+      box-shadow: 0 0 24px #66e8ff;
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: left center;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .smoke {
+      position: absolute;
+      left: 28%;
+      top: 41%;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #cbd1dc;
+      box-shadow: 22px 5px 0 #e1e5ec, -12px 10px 0 #b8bfcc;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-wrap,
+    .boss-wrap {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-character {
+      width: clamp(124px, 22vw, 192px);
+      height: clamp(146px, 27vw, 224px);
+      display: block;
+      transform-origin: 50% 100%;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .hero-character::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -10%;
+      width: calc(100% * var(--aura-width, 1));
+      height: calc(108% * var(--aura-height, 1));
+      border-radius: 46% 46% 38% 38%;
+      background:
+        linear-gradient(104deg, transparent 0 8%, rgba(255, 255, 255, var(--aura-streak, 0)) 9% 12%, transparent 13% 24%, rgba(255, 255, 255, var(--aura-streak, 0)) 25% 29%, transparent 30% 100%),
+        linear-gradient(72deg, transparent 0 13%, rgba(255, 255, 255, var(--aura-streak, 0)) 14% 17%, transparent 18% 43%, rgba(255, 255, 255, var(--aura-streak, 0)) 44% 47%, transparent 48% 100%),
+        radial-gradient(ellipse at 50% 94%, rgba(255, 252, 196, var(--aura-ring, 0)) 0 20%, rgba(255, 200, 0, var(--aura-alpha, 0)) 22% 38%, transparent 42%),
+        radial-gradient(ellipse at 50% 62%, rgba(255, 255, 238, var(--aura-core, 0)), rgba(255, 238, 74, var(--aura-alpha, 0)) 30%, rgba(255, 168, 0, var(--aura-alpha, 0)) 56%, transparent 71%),
+        conic-gradient(from -18deg, transparent 0 5%, rgba(255, 213, 0, var(--aura-ray, 0)) 6% 12%, transparent 13% 18%, rgba(255, 255, 255, var(--aura-streak, 0)) 19% 22%, transparent 23% 29%, rgba(255, 180, 0, var(--aura-ray, 0)) 30% 38%, transparent 39% 45%, rgba(255, 255, 255, var(--aura-streak, 0)) 46% 49%, transparent 50% 56%, rgba(255, 213, 0, var(--aura-ray, 0)) 57% 66%, transparent 67% 100%);
+      border: var(--aura-border, 0) solid rgba(255, 245, 81, 0.98);
+      clip-path: polygon(50% 0%, 56% 17%, 63% 3%, 66% 21%, 75% 9%, 75% 28%, 87% 18%, 81% 39%, 99% 34%, 84% 49%, 99% 61%, 79% 60%, 88% 81%, 70% 72%, 67% 96%, 56% 78%, 50% 100%, 44% 78%, 33% 96%, 30% 72%, 12% 81%, 21% 60%, 1% 61%, 16% 49%, 1% 34%, 19% 39%, 13% 18%, 25% 28%, 25% 9%, 34% 21%, 37% 3%, 44% 17%);
+      box-shadow:
+        0 0 0 var(--aura-outline, 0) rgba(255, 255, 255, 0.92),
+        0 0 22px rgba(255, 251, 151, var(--aura-opacity, 0)),
+        0 0 52px rgba(255, 213, 0, var(--aura-opacity, 0)),
+        0 0 92px rgba(255, 150, 0, var(--aura-opacity, 0));
+      filter: saturate(1.8) contrast(1.18);
+      opacity: var(--aura-opacity, 0);
+      transform: translateX(-50%) scale(var(--aura-scale, 0.8));
+      transition: opacity 0.45s ease, transform 0.45s ease, background 0.45s ease, filter 0.45s ease, box-shadow 0.45s ease;
+      pointer-events: none;
+      z-index: -1;
+      animation: auraPowerFlicker 1.45s ease-in-out infinite;
+    }
+
+    .hero-aura-level-1 { --aura-alpha: 0.5; --aura-core: 0.28; --aura-ray: 0.34; --aura-streak: 0.24; --aura-ring: 0.45; --aura-opacity: 0.76; --aura-scale: 1; --aura-width: 1.28; --aura-height: 1.15; --aura-border: 2px; --aura-outline: 2px; }
+    .hero-aura-level-2 { --aura-alpha: 0.62; --aura-core: 0.38; --aura-ray: 0.48; --aura-streak: 0.34; --aura-ring: 0.56; --aura-opacity: 0.86; --aura-scale: 1.1; --aura-width: 1.5; --aura-height: 1.32; --aura-border: 3px; --aura-outline: 3px; }
+    .hero-aura-level-3 { --aura-alpha: 0.74; --aura-core: 0.48; --aura-ray: 0.62; --aura-streak: 0.46; --aura-ring: 0.68; --aura-opacity: 0.94; --aura-scale: 1.19; --aura-width: 1.72; --aura-height: 1.48; --aura-border: 4px; --aura-outline: 4px; }
+    .hero-aura-level-4 { --aura-alpha: 0.86; --aura-core: 0.58; --aura-ray: 0.74; --aura-streak: 0.58; --aura-ring: 0.8; --aura-opacity: 1; --aura-scale: 1.28; --aura-width: 1.96; --aura-height: 1.68; --aura-border: 5px; --aura-outline: 5px; }
+    .hero-aura-level-5 { --aura-alpha: 0.98; --aura-core: 0.72; --aura-ray: 0.9; --aura-streak: 0.72; --aura-ring: 0.95; --aura-opacity: 1; --aura-scale: 1.38; --aura-width: 2.18; --aura-height: 1.88; --aura-border: 6px; --aura-outline: 6px; }
+
+    .hero-art {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 3;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 0 rgba(36, 48, 71, 0.12));
+    }
+
+    .hero-face {
+      position: absolute;
+      top: var(--face-top, 24.4%);
+      left: var(--face-left, 49.7%);
+      width: var(--face-size, 27.4%);
+      aspect-ratio: 1;
+      height: auto;
+      border: 0;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #ffe1bc, #ffd1d7);
+      object-fit: cover;
+      z-index: 2;
+      transform: translateX(-50%);
+      box-shadow: inset 0 0 0 2px rgba(255, 217, 73, 0.52);
+    }
+
+    .hero-character.hero-pose-idle {
+      --face-top: 24.4%;
+      --face-left: 49.7%;
+      --face-size: 27.4%;
+    }
+
+    .hero-character.hero-pose-ready {
+      --face-top: 26.9%;
+      --face-left: 48.4%;
+      --face-size: 27.8%;
+    }
+
+    .hero-character.hero-pose-victory {
+      --face-top: 19.7%;
+      --face-left: 49%;
+      --face-size: 29.7%;
+    }
+
+    .hero-character.hero-pose-blown,
+    .hero-character.hero-pose-sad {
+      --face-top: 23.9%;
+      --face-left: 53.3%;
+      --face-size: 26.2%;
+    }
+
+    .hero-body {
+      display: none;
+    }
+
+    .hero-body::before,
+    .hero-body::after {
+      content: "";
+      position: absolute;
+      top: 24px;
+      width: 26px;
+      height: 48px;
+      border: 5px solid #243047;
+      border-radius: 999px;
+      background: #ffd1a6;
+    }
+
+    .hero-body::before {
+      left: -24px;
+      transform: rotate(22deg);
+    }
+
+    .hero-body::after {
+      right: -24px;
+      transform: rotate(-22deg);
+    }
+
+    .hero-name,
+    .boss-name {
+      margin: 0;
+      font-weight: 950;
+      font-size: clamp(1rem, 2.6vw, 1.2rem);
+      text-align: center;
+    }
+
+    .boss-monster {
+      width: clamp(128px, 24vw, 190px);
+      height: clamp(134px, 25vw, 200px);
+      border: 5px solid #243047;
+      border-radius: 44% 44% 28% 28%;
+      background:
+        radial-gradient(circle at 35% 38%, #243047 0 8px, transparent 9px),
+        radial-gradient(circle at 65% 38%, #243047 0 8px, transparent 9px),
+        radial-gradient(ellipse at 50% 62%, #ffffff 0 20px, transparent 21px),
+        linear-gradient(150deg, #ff9f45, #ffcf5a);
+      position: relative;
+      transform-origin: 50% 100%;
+      box-shadow: 0 10px 0 rgba(36, 48, 71, 0.18);
+    }
+
+    .boss-monster::before,
+    .boss-monster::after {
+      content: "";
+      position: absolute;
+      top: -24px;
+      width: 38px;
+      height: 44px;
+      border: 5px solid #243047;
+      border-radius: 50% 50% 8px 8px;
+      background: #ffcf5a;
+    }
+
+    .boss-monster::before {
+      left: 16px;
+      transform: rotate(-24deg);
+    }
+
+    .boss-monster::after {
+      right: 16px;
+      transform: rotate(24deg);
+    }
+
+    .boss-mouth {
+      position: absolute;
+      left: 50%;
+      top: 61%;
+      width: 42px;
+      height: 16px;
+      border-bottom: 5px solid #243047;
+      border-radius: 0 0 999px 999px;
+      transform: translateX(-50%);
+    }
+
+    .boss-stats {
+      display: grid;
+      gap: 10px;
+    }
+
+    .boss-meter-row {
+      display: grid;
+      gap: 8px;
+      font-weight: 950;
+    }
+
+    .special-meter {
+      height: 24px;
+      border: 3px solid #243047;
+      border-radius: 999px;
+      background: #ece6d3;
+      overflow: hidden;
+    }
+
+    .special-meter-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ffd66b, #4fdd8b, #66e8ff);
+      transition: width 0.3s ease;
+    }
+
+    .boss-question {
+      display: grid;
+      gap: 12px;
+      padding: clamp(14px, 3vw, 20px);
+      border: 3px solid #243047;
+      border-radius: 20px;
+      background: #ffffff;
+    }
+
+    .boss-sentence {
+      margin: 0;
+      padding: 16px;
+      border-radius: 16px;
+      background: #fff8db;
+      border: 3px dashed #ffbf52;
+      font-size: clamp(1.55rem, 5vw, 3rem);
+      line-height: 1.2;
+      font-weight: 950;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    .boss-choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .boss-choices .action-button {
+      grid-column: 1 / -1;
+    }
+
+    .boss-message {
+      min-height: 52px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #f4f7ff;
+      border: 2px solid #d8e0ff;
+      font-size: clamp(1.05rem, 2.8vw, 1.3rem);
+      font-weight: 950;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .final-call {
+      min-height: 44px;
+      font-size: clamp(1.35rem, 4vw, 2.4rem);
+      font-weight: 950;
+      text-align: center;
+      color: #315ad8;
+    }
+
+    .boss-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .boss-card.flash {
+      animation: battleFlash 0.8s ease;
+    }
+
+    .hero-character.jump {
+      animation: heroJump 0.55s ease;
+    }
+
+    .hero-character.sad {
+      animation: heroSad 0.65s ease;
+    }
+
+    .hero-character.defeated {
+      animation: heroDefeated 0.9s ease forwards;
+    }
+
+    .boss-monster.hit {
+      animation: bossHit 0.5s ease;
+    }
+
+    .boss-monster.laugh {
+      animation: bossLaugh 0.55s ease;
+    }
+
+    .boss-monster.defeated {
+      animation: bossDefeated 0.9s ease forwards;
+    }
+
+    .beam.fire {
+      animation: beamFire 0.9s ease forwards;
+    }
+
+    .smoke.puff {
+      animation: smokePuff 1s ease forwards;
+    }
+
+    @keyframes heroJump {
+      0%, 100% { transform: translateY(0) scale(1); }
+      45% { transform: translateY(-24px) scale(1.04); }
+    }
+
+    @keyframes heroSad {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      45% { transform: translateY(8px) rotate(-4deg); }
+    }
+
+    @keyframes heroDefeated {
+      0% { transform: rotate(0deg) translateY(0); }
+      100% { transform: rotate(-12deg) translateY(16px) scale(0.94); opacity: 0.9; }
+    }
+
+    @keyframes bossHit {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(12px) rotate(3deg); }
+      50% { transform: translateX(-10px) rotate(-3deg); }
+      75% { transform: translateX(6px); }
+    }
+
+    @keyframes bossLaugh {
+      0%, 100% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-8px) scale(1.04); }
+      70% { transform: translateY(0) scale(1.02); }
+    }
+
+    @keyframes bossDefeated {
+      0% { transform: rotate(0deg) translateY(0); }
+      100% { transform: rotate(14deg) translateY(22px) scale(0.86); opacity: 0.45; }
+    }
+
+    @keyframes beamFire {
+      0% { opacity: 0; transform: scaleX(0); }
+      22% { opacity: 1; transform: scaleX(1); }
+      80% { opacity: 1; transform: scaleX(1); }
+      100% { opacity: 0; transform: scaleX(1); }
+    }
+
+    @keyframes smokePuff {
+      0% { opacity: 0; transform: translateY(8px) scale(0.4); }
+      35% { opacity: 1; transform: translateY(-4px) scale(1); }
+      100% { opacity: 0; transform: translateY(-18px) scale(1.35); }
+    }
+
+    @keyframes battleFlash {
+      0%, 100% { box-shadow: var(--shadow); }
+      35% { box-shadow: 0 0 0 8px rgba(255, 214, 107, 0.8), 0 0 44px rgba(102, 232, 255, 0.9); }
+    }
+
+    .boss-card {
+      gap: 10px;
+      min-height: min(780px, calc(100vh - 120px));
+      padding: clamp(10px, 2vw, 16px);
+    }
+
+    .boss-card .subtitle {
+      margin-top: 3px;
+      font-size: clamp(0.85rem, 2vw, 1rem);
+    }
+
+    .boss-top {
+      gap: 8px;
+    }
+
+    .boss-title {
+      font-size: clamp(1.25rem, 3vw, 1.85rem);
+    }
+
+    .boss-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .battle-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+      font-size: 0.86rem;
+      font-weight: 900;
+    }
+
+    .battle-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 32px;
+      padding: 5px 8px;
+      border: 2px solid #d8e0ff;
+      border-radius: 999px;
+      background: #ffffff;
+    }
+
+    .photo-upload {
+      min-height: 40px;
+      padding: 8px 10px;
+      border-width: 2px;
+      border-radius: 12px;
+      box-shadow: 0 4px 0 #243047;
+      font-size: 0.9rem;
+    }
+
+    .arena {
+      grid-template-columns: 1fr minmax(150px, 0.8fr) 1fr;
+      min-height: 190px;
+      padding: 10px;
+      gap: clamp(8px, 2vw, 18px);
+      align-items: center;
+    }
+
+    .vs-panel {
+      display: grid;
+      gap: 8px;
+      align-self: stretch;
+      align-content: center;
+      justify-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .vs-mark {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border: 3px solid #243047;
+      border-radius: 50%;
+      background: #ffd66b;
+      box-shadow: 0 5px 0 #243047;
+      font-size: 1.25rem;
+      font-weight: 950;
+    }
+
+    .boss-stats {
+      width: min(330px, 100%);
+      gap: 6px;
+    }
+
+    .boss-stats .stats {
+      justify-content: center;
+      gap: 6px;
+      font-size: clamp(0.82rem, 1.8vw, 0.98rem);
+    }
+
+    .boss-stats .pill {
+      min-height: 30px;
+      padding: 4px 8px;
+    }
+
+    .boss-meter-row {
+      width: 100%;
+    }
+
+    .special-meter {
+      height: 22px;
+      position: relative;
+    }
+
+    .special-meter-fill.charge {
+      animation: gaugeCharge 0.7s ease;
+    }
+
+    .special-meter-fill.max {
+      background: linear-gradient(90deg, #ff5ad1, #ffd66b, #67d477, #66e8ff, #9d6bff);
+      animation: gaugeMax 1s linear infinite;
+    }
+
+    .special-meter-fill.fizzle {
+      filter: grayscale(0.9) brightness(0.65);
+      animation: gaugeFizzle 0.9s ease;
+    }
+
+    .charge-text {
+      min-height: 22px;
+      color: #315ad8;
+      font-weight: 950;
+      text-align: center;
+      opacity: 0;
+    }
+
+    .charge-text.show {
+      animation: chargePop 0.85s ease;
+    }
+
+    .spark {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffd66b;
+      box-shadow: 0 0 12px #fff36d;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .spark.fly {
+      animation: sparkFly 0.85s ease forwards;
+    }
+
+    .boss-monster {
+      width: clamp(86px, 15vw, 124px);
+      height: clamp(92px, 16vw, 132px);
+      border-width: 4px;
+      background:
+        radial-gradient(circle at 35% 38%, #d91844 0 8px, transparent 9px),
+        radial-gradient(circle at 65% 38%, #d91844 0 8px, transparent 9px),
+        linear-gradient(135deg, #6c29b9, #241238 55%, #ff5a3c);
+      box-shadow: 0 0 24px rgba(83, 26, 130, 0.75), 0 9px 0 rgba(36, 48, 71, 0.2);
+      animation: bossIdle 2.8s ease-in-out infinite;
+    }
+
+    .boss-monster::before,
+    .boss-monster::after {
+      width: 28px;
+      height: 34px;
+      border-width: 4px;
+      background: #2b123f;
+    }
+
+    .boss-monster::before {
+      left: 8px;
+    }
+
+    .boss-monster::after {
+      right: 8px;
+    }
+
+    .boss-face-img {
+      position: absolute;
+      inset: 15% 18% auto;
+      width: 64%;
+      aspect-ratio: 1;
+      border: 3px solid #1b102b;
+      border-radius: 50%;
+      object-fit: cover;
+      filter: saturate(1.25) contrast(1.08) drop-shadow(0 0 8px rgba(213, 21, 68, 0.45));
+      display: none;
+    }
+
+    .boss-monster.custom .boss-face-img {
+      display: block;
+    }
+
+    .boss-monster.custom {
+      background:
+        radial-gradient(circle at 25% 22%, rgba(255, 0, 89, 0.7), transparent 18%),
+        radial-gradient(circle at 76% 24%, rgba(255, 0, 89, 0.7), transparent 18%),
+        linear-gradient(135deg, #301044, #891f55 58%, #171021);
+    }
+
+    .boss-monster.level-1 {
+      border-radius: 50% 50% 34% 34%;
+      background:
+        radial-gradient(circle at 35% 40%, #d91844 0 7px, transparent 8px),
+        radial-gradient(circle at 65% 40%, #d91844 0 7px, transparent 8px),
+        linear-gradient(180deg, #7758ff, #3ad18b);
+    }
+
+    .boss-monster.level-2 {
+      background:
+        radial-gradient(circle at 35% 38%, #d91844 0 8px, transparent 9px),
+        radial-gradient(circle at 65% 38%, #d91844 0 8px, transparent 9px),
+        linear-gradient(135deg, #141424, #5f2dbd);
+    }
+
+    .boss-monster.level-3 {
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 35% 38%, #d91844 0 7px, transparent 8px),
+        radial-gradient(circle at 65% 38%, #d91844 0 7px, transparent 8px),
+        linear-gradient(135deg, #797f8d, #343946);
+    }
+
+    .boss-monster.level-4 {
+      background:
+        radial-gradient(circle at 35% 38%, #d91844 0 8px, transparent 9px),
+        radial-gradient(circle at 65% 38%, #d91844 0 8px, transparent 9px),
+        linear-gradient(135deg, #ff6a3d, #331348);
+    }
+
+    .boss-monster.level-5 {
+      background:
+        radial-gradient(circle at 35% 38%, #ff143f 0 9px, transparent 10px),
+        radial-gradient(circle at 65% 38%, #ff143f 0 9px, transparent 10px),
+        linear-gradient(135deg, #1a102a, #8426b8 48%, #ff4e45);
+    }
+
+    .boss-monster.level-6 {
+      background:
+        radial-gradient(circle at 35% 38%, #ff143f 0 9px, transparent 10px),
+        radial-gradient(circle at 65% 38%, #ff143f 0 9px, transparent 10px),
+        linear-gradient(135deg, #120719, #6b168f 44%, #ff2f6d);
+      box-shadow: 0 0 30px rgba(255, 47, 109, 0.58), 0 9px 0 rgba(36, 48, 71, 0.2);
+    }
+
+    .boss-aura {
+      position: absolute;
+      inset: -24px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 20% 70%, rgba(105, 38, 199, 0.38), transparent 28%),
+        radial-gradient(circle at 78% 72%, rgba(255, 0, 76, 0.28), transparent 32%);
+      filter: blur(2px);
+      z-index: -1;
+      animation: auraPulse 1.9s ease-in-out infinite;
+    }
+
+    .boss-question {
+      gap: 6px;
+      padding: 8px;
+      border-radius: 16px;
+    }
+
+    .boss-question.correct-flash {
+      border-color: #1c9b63;
+      box-shadow: 0 0 0 4px rgba(28, 155, 99, 0.12), 0 0 24px rgba(103, 212, 119, 0.55);
+      animation: cardCorrectPop 0.65s ease;
+    }
+
+    .boss-question.wrong-flash {
+      border-color: #ff8c42;
+      box-shadow: 0 0 0 4px rgba(255, 140, 66, 0.12), 0 0 22px rgba(255, 159, 69, 0.45);
+      animation: cardWrongShake 0.55s ease;
+    }
+
+    .boss-question .question-type {
+      display: inline-block;
+      width: fit-content;
+      max-width: 100%;
+      padding: 3px 8px;
+      border-radius: 9px;
+      background: #e9f1ff;
+      color: #315ad8;
+      font-size: clamp(0.95rem, 2.2vw, 1.12rem);
+      line-height: 1.25;
+    }
+
+    .boss-question .japanese {
+      display: inline-block;
+      width: fit-content;
+      max-width: 100%;
+      padding: 4px 8px;
+      border: 2px solid #ffbf52;
+      border-radius: 10px;
+      background: #fff4d6;
+      color: #b35a00;
+      font-size: clamp(0.94rem, 2.45vw, 1.18rem);
+      font-weight: 950;
+      line-height: 1.25;
+      box-shadow: 0 2px 0 rgba(179, 90, 0, 0.18);
+    }
+
+    .boss-sentence {
+      padding: 8px;
+      border-width: 2px;
+      border-radius: 12px;
+      font-size: clamp(1.08rem, 3.7vw, 1.85rem);
+    }
+
+    .boss-choices {
+      gap: 7px;
+    }
+
+    .boss-choices .choice-button,
+    .boss-choices .action-button {
+      min-height: 38px;
+      padding: 7px 9px;
+      border-width: 2px;
+      border-radius: 11px;
+      box-shadow: 0 4px 0 #243047;
+      font-size: clamp(0.95rem, 2.7vw, 1.25rem);
+    }
+
+    .boss-choices .choice-button.correct {
+      background: #c9ffd9;
+      border-color: #14a45c;
+      color: #0f7447;
+      box-shadow: 0 0 0 4px rgba(28, 155, 99, 0.24), 0 5px 0 #0f7447;
+      transform: scale(1.04);
+      animation: correctGlow 0.9s ease;
+    }
+
+    .boss-choices .choice-button.wrong {
+      background: #ffe0df;
+      border-color: #d84b4b;
+      color: #b72e2e;
+      box-shadow: 0 0 0 4px rgba(216, 75, 75, 0.2), 0 5px 0 #a13a3a;
+      animation: wrongShake 0.42s ease;
+    }
+
+    .boss-choices .choice-button.dimmed {
+      opacity: 0.46;
+      filter: grayscale(0.35);
+    }
+
+    .boss-message {
+      min-height: 34px;
+      max-height: 3.15em;
+      overflow: hidden;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: #fff8db;
+      border: 2px solid #ffd66b;
+      font-size: clamp(0.84rem, 2.05vw, 1rem);
+      line-height: 1.35;
+      text-align: left;
+    }
+
+    .boss-message::before {
+      content: "ポイント：";
+      color: #315ad8;
+      font-weight: 950;
+    }
+
+    .boss-message.correct {
+      background: #ecfff4;
+      border-color: #67d477;
+    }
+
+    .boss-message.wrong {
+      background: #fff3e5;
+      border-color: #ff9f45;
+    }
+
+    .final-call {
+      min-height: 28px;
+      font-size: clamp(1.1rem, 3.4vw, 1.9rem);
+      line-height: 1.1;
+    }
+
+    .beam {
+      left: 23%;
+      right: 21%;
+      top: 38%;
+      height: 24px;
+      background: linear-gradient(90deg, #fff36d, #66e8ff, #ff5ad1, #ffffff);
+    }
+
+    .beam.fire {
+      animation: beamFire 1.8s ease forwards, beamWobble 0.42s linear 5;
+    }
+
+    .ultimate-beam-image {
+      position: absolute;
+      left: 12%;
+      top: 18%;
+      width: 76%;
+      height: 64%;
+      z-index: 6;
+      object-fit: fill;
+      object-position: left center;
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: left center;
+      transform: translateX(-6%) scaleX(0.32) scaleY(0.78);
+      filter: drop-shadow(0 0 22px rgba(255, 216, 0, 0.82)) saturate(1.35);
+    }
+
+    .ultimate-beam-image.fire {
+      animation: ultimateBeamImageFire 1.9s ease forwards;
+    }
+
+    .ultimate-prop {
+      position: absolute;
+      left: 6%;
+      top: 33%;
+      z-index: 8;
+      min-width: clamp(142px, 30vw, 280px);
+      min-height: clamp(96px, 20vw, 190px);
+      display: grid;
+      place-items: center;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 28px;
+      background: transparent;
+      box-shadow: none;
+      font-size: clamp(5.8rem, 21vw, 13rem);
+      font-weight: 950;
+      pointer-events: none;
+      opacity: 0;
+      filter: drop-shadow(0 9px 0 rgba(36, 48, 71, 0.28)) drop-shadow(0 0 18px rgba(255, 214, 107, 0.82));
+      white-space: nowrap;
+    }
+
+    .ultimate-prop.waterBottleSplash {
+      font-size: clamp(3.4rem, 12vw, 7rem);
+      color: #315ad8;
+      background: linear-gradient(180deg, #e4fbff, #9fe7ff 46%, #4f7cff);
+      border: 6px solid #243047;
+      border-radius: 34px 34px 22px 22px;
+      box-shadow: 0 10px 0 rgba(36, 48, 71, 0.28), 0 0 28px rgba(102, 232, 255, 0.78);
+    }
+
+    .ultimate-prop.broom { animation: broomUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.car { animation: carUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.eraser { animation: eraserUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.washer { animation: washerUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.print { animation: printUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.bagPush { animation: bagPushUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.pencilRocket { animation: carUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.eraserRoller { animation: washerUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.rulerSlash { animation: eraserUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.trayCannon { animation: carUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.shoeDash { animation: bagPushUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.notebookFlash { animation: printUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.recorderSonic { animation: washerUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.chalkMissile { animation: carUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.tapeWrap { animation: washerUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.fartBarrier { animation: bagPushUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.poopAvoid { animation: broomUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.dustpanPusun { animation: broomUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.jumpRopeSpin { animation: washerUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.waterBottleSplash { animation: carUltimate 1.8s ease-in-out forwards; }
+
+    .smoke {
+      left: 28%;
+      top: 38%;
+      width: 26px;
+      height: 26px;
+    }
+
+    .smoke.puff {
+      animation: smokePuff 1s ease forwards, smokeMulti 1s ease forwards;
+    }
+
+    .puff-text {
+      position: absolute;
+      left: 50%;
+      top: 18%;
+      transform: translateX(-50%);
+      padding: 6px 12px;
+      border: 3px solid #243047;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #657089;
+      font-size: clamp(1.3rem, 4vw, 2.2rem);
+      font-weight: 950;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .puff-text.show {
+      animation: puffText 1.3s ease forwards;
+    }
+
+    .answer-burst {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      z-index: 5;
+      max-width: min(210px, 58vw);
+      padding: 8px 12px;
+      border: 2px solid rgba(36, 48, 71, 0.72);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(6px);
+      color: #243047;
+      text-align: left;
+      font-weight: 950;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+    }
+
+    .answer-burst.show {
+      animation: answerBurst 2.1s ease forwards;
+    }
+
+    .answer-burst.correct {
+      background: rgba(230, 255, 239, 0.82);
+      border-color: #1c9b63;
+      box-shadow: 0 0 18px rgba(28, 155, 99, 0.34);
+    }
+
+    .answer-burst.wrong {
+      background: rgba(255, 244, 232, 0.86);
+      border-color: #ff8c42;
+      box-shadow: 0 0 16px rgba(255, 124, 80, 0.3);
+    }
+
+    .answer-burst.wrong.show {
+      animation-duration: 2.35s;
+    }
+
+    .burst-main {
+      display: inline;
+      font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+      line-height: 1.15;
+    }
+
+    .burst-sub {
+      display: none;
+      margin-left: 6px;
+      font-size: clamp(0.78rem, 2.1vw, 0.95rem);
+      line-height: 1.2;
+    }
+
+    .particle-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 7;
+    }
+
+    .battle-particle {
+      position: absolute;
+      left: var(--x, 50%);
+      top: var(--y, 50%);
+      color: var(--color, #ffd66b);
+      font-weight: 950;
+      font-size: var(--size, 1rem);
+      text-shadow: 0 2px 0 #243047, 0 0 12px currentColor;
+      opacity: 0;
+      transform: translate(0, 0) scale(0.7) rotate(0deg);
+      animation: particleFly var(--dur, 1.8s) ease-out forwards;
+    }
+
+    .battle-particle.ultimate {
+      animation-name: particleBurst;
+      animation-duration: var(--dur, 1.45s);
+    }
+
+    .battle-particle.smoke-bit {
+      width: var(--size, 28px);
+      height: var(--size, 28px);
+      border-radius: 50%;
+      background: #cbd1dc;
+      color: transparent;
+      box-shadow: 12px 4px 0 #e1e5ec;
+      animation-name: smokeFloat;
+      animation-duration: var(--dur, 1.35s);
+    }
+
+    .crop-panel {
+      display: none;
+      gap: 10px;
+      padding: 12px;
+      border: 3px solid #243047;
+      border-radius: 18px;
+      background: #fffdf4;
+    }
+
+    .crop-panel.show {
+      display: grid;
+    }
+
+    .crop-title {
+      margin: 0;
+      font-size: clamp(1rem, 2.4vw, 1.25rem);
+      font-weight: 950;
+    }
+
+    .crop-work {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .crop-canvas-wrap {
+      width: 220px;
+      height: 220px;
+      position: relative;
+      border: 3px solid #243047;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #101828;
+      touch-action: none;
+    }
+
+    #cropCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .crop-canvas-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 0 37%, rgba(0, 0, 0, 0.58) 38% 100%);
+    }
+
+    .crop-controls {
+      display: grid;
+      gap: 10px;
+      font-weight: 900;
+    }
+
+    .crop-controls input[type="range"] {
+      width: 100%;
+    }
+
+    .crop-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .crop-buttons .action-button {
+      min-height: 42px;
+      padding: 8px 12px;
+      font-size: 1rem;
+    }
+
+    .hero-character.powerup {
+      animation: heroPower 2.1s ease;
+      filter: drop-shadow(0 0 24px #66e8ff);
+    }
+
+    .hero-character.powerup::before {
+      content: none;
+    }
+
+    .hero-character.ultimate-charging {
+      animation: ultimateHeroTremble 0.22s linear infinite;
+    }
+
+    .hero-character.ultimate-charging::after {
+      z-index: 1;
+      opacity: 1;
+      filter: saturate(2.1) contrast(1.28) brightness(1.12);
+      animation: ultimateAuraGoGo 0.18s linear infinite;
+    }
+
+    .hero-character.ultimate-charging::before {
+      content: "ゴゴゴゴ";
+      position: absolute;
+      left: 50%;
+      top: -20px;
+      z-index: 2;
+      padding: 2px 8px;
+      border: 3px solid #243047;
+      border-radius: 999px;
+      background: rgba(255, 246, 110, 0.92);
+      color: #243047;
+      font-size: clamp(0.82rem, 2.2vw, 1rem);
+      font-weight: 950;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      animation: gogoTextShake 0.18s linear infinite;
+    }
+
+    .hero-character.ready {
+      animation: heroReady 0.9s ease;
+    }
+
+    .hero-character.hero-blown-away {
+      animation: heroBlownAway 1.45s cubic-bezier(.2, .9, .25, 1) forwards;
+      filter: drop-shadow(0 0 12px rgba(255, 159, 69, 0.65));
+    }
+
+    .hero-character.hero-blown-away::before {
+      content: "汗";
+      position: absolute;
+      top: -10px;
+      right: -18px;
+      z-index: 4;
+      padding: 3px 6px;
+      border: 3px solid #243047;
+      border-radius: 999px;
+      background: #e4fbff;
+      color: #315ad8;
+      font-size: clamp(0.9rem, 2.4vw, 1.15rem);
+      font-weight: 950;
+      opacity: 0;
+      animation: sweatPop 1.1s ease forwards;
+    }
+
+    .hero-character.hero-dizzy::after {
+      box-shadow: 0 0 0 9px rgba(255, 214, 107, 0.34), 0 0 34px rgba(102, 232, 255, 0.62);
+    }
+
+    .boss-monster.boss-counter {
+      animation: bossCounter 1.05s ease;
+      filter: brightness(1.24) saturate(1.25);
+    }
+
+    .boss-monster.blasted-spin {
+      animation: bossBlastedSpin 1.2s ease forwards;
+    }
+
+    .boss-monster.blasted-up {
+      animation: bossBlastedUp 1.2s ease forwards;
+    }
+
+    .boss-monster.blasted-skew {
+      animation: bossBlastedSkew 1.2s ease forwards;
+    }
+
+    .boss-monster.blasted-crash {
+      animation: bossBlastedCrash 1.2s ease forwards;
+    }
+
+    .boss-monster.blasted-bounce {
+      animation: bossBlastedBounce 1.25s ease forwards;
+    }
+
+    .boss-monster.blasted-aura {
+      animation: bossBlastedAura 1.2s ease forwards;
+    }
+
+    .boss-monster.gloated {
+      animation: bossGloat 0.9s ease;
+    }
+
+    @keyframes gaugeCharge {
+      0%, 100% { filter: brightness(1); }
+      45% { filter: brightness(1.8) drop-shadow(0 0 10px #66e8ff); }
+    }
+
+    @keyframes gaugeMax {
+      0% { filter: hue-rotate(0deg) brightness(1.2); }
+      100% { filter: hue-rotate(360deg) brightness(1.45); }
+    }
+
+    @keyframes gaugeFizzle {
+      0% { transform: scaleX(1); }
+      40% { transform: scaleX(0.96); }
+      100% { transform: scaleX(1); }
+    }
+
+    @keyframes chargePop {
+      0% { opacity: 0; transform: translateY(6px) scale(0.9); }
+      25%, 80% { opacity: 1; transform: translateY(0) scale(1.05); }
+      100% { opacity: 0; transform: translateY(-4px) scale(1); }
+    }
+
+    @keyframes sparkFly {
+      0% { opacity: 0; transform: translate(-40px, 32px) scale(0.4); }
+      25% { opacity: 1; }
+      100% { opacity: 0; transform: translate(38px, -28px) scale(1.1); }
+    }
+
+    @keyframes bossIdle {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-5px) rotate(1deg); }
+    }
+
+    @keyframes auraPulse {
+      0%, 100% { opacity: 0.55; transform: scale(0.96); }
+      50% { opacity: 0.95; transform: scale(1.05); }
+    }
+
+    @keyframes auraPowerFlicker {
+      0%, 100% { filter: saturate(1.45) contrast(1.08) brightness(1); }
+      50% { filter: saturate(1.75) contrast(1.15) brightness(1.12); }
+    }
+
+    @keyframes heroPower {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.1) translateY(-12px); }
+      70% { transform: scale(1.03) translateY(-2px); }
+    }
+
+    @keyframes heroAuraBurst {
+      0% { opacity: 0; transform: scale(0.72); }
+      18% { opacity: 1; transform: scale(1.08); }
+      70% { opacity: 0.7; transform: scale(1.38); }
+      100% { opacity: 0; transform: scale(1.55); }
+    }
+
+    @keyframes ultimateHeroTremble {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-1px, 1px) rotate(-0.8deg); }
+      50% { transform: translate(1px, -1px) rotate(0.8deg); }
+      75% { transform: translate(-1px, -1px) rotate(0.3deg); }
+    }
+
+    @keyframes ultimateAuraGoGo {
+      0%, 100% { transform: translateX(-50%) scale(1.38) rotate(0deg); }
+      25% { transform: translateX(-50%) translate(-2px, 1px) scale(1.42) rotate(-1deg); }
+      50% { transform: translateX(-50%) translate(2px, -1px) scale(1.4) rotate(1deg); }
+      75% { transform: translateX(-50%) translate(-1px, -2px) scale(1.44) rotate(-0.4deg); }
+    }
+
+    @keyframes gogoTextShake {
+      0%, 100% { transform: translateX(-50%) translate(0, 0) rotate(0deg); }
+      50% { transform: translateX(-50%) translate(2px, -1px) rotate(1deg); }
+    }
+
+    @keyframes heroReady {
+      0%, 100% { transform: translateX(0) scale(1); }
+      35% { transform: translateX(8px) scale(0.96); }
+      70% { transform: translateX(-4px) scale(1.04); }
+    }
+
+    @keyframes heroBlownAway {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+      16% { transform: translate(-10px, -8px) rotate(-8deg) scale(1.08); }
+      42% { transform: translate(-82px, -38px) rotate(-210deg) scale(0.94); }
+      70% { transform: translate(-126px, 18px) rotate(-342deg) scale(0.86); }
+      100% { transform: translate(-96px, 34px) rotate(-22deg) scale(0.82); opacity: 0.9; }
+    }
+
+    @keyframes sweatPop {
+      0% { opacity: 0; transform: translateY(8px) scale(0.4) rotate(-14deg); }
+      22%, 78% { opacity: 1; transform: translateY(0) scale(1.08) rotate(8deg); }
+      100% { opacity: 0; transform: translateY(-20px) scale(0.92) rotate(14deg); }
+    }
+
+    @keyframes bossCounter {
+      0%, 100% { transform: translateX(0) scale(1); }
+      22% { transform: translateX(-12px) scale(1.08) rotate(-3deg); }
+      48% { transform: translateX(18px) scale(1.16) rotate(4deg); }
+      72% { transform: translateX(4px) scale(1.06) rotate(-1deg); }
+    }
+
+    @keyframes beamWobble {
+      0%, 100% { filter: hue-rotate(0deg); }
+      50% { filter: hue-rotate(80deg); }
+    }
+
+    @keyframes ultimateBeamImageFire {
+      0% { opacity: 0; transform: translateX(-10%) scaleX(0.18) scaleY(0.72); filter: blur(5px) brightness(1.15) saturate(1.2); }
+      18% { opacity: 1; transform: translateX(-3%) scaleX(0.52) scaleY(0.86); filter: blur(2px) brightness(1.22) saturate(1.3); }
+      64% { opacity: 1; transform: translateX(1%) scaleX(1.06) scaleY(1.03); filter: blur(0) brightness(1.35) saturate(1.42); }
+      100% { opacity: 0; transform: translateX(7%) scaleX(1.18) scaleY(1.08); filter: blur(2px) brightness(1.2) saturate(1.3); }
+    }
+
+    @keyframes broomUltimate {
+      0% { opacity: 0; transform: translate(0, 12px) rotate(-12deg) scale(0.65); }
+      18% { opacity: 1; }
+      70% { opacity: 1; transform: translate(43vw, 2px) rotate(9deg) scale(1.08); }
+      100% { opacity: 0; transform: translate(58vw, -4px) rotate(14deg) scale(0.95); }
+    }
+
+    @keyframes carUltimate {
+      0% { opacity: 0; transform: translate(0, 28px) scale(0.65); }
+      20% { opacity: 1; transform: translate(7vw, 22px) scale(1); }
+      78% { opacity: 1; transform: translate(45vw, 15px) rotate(2deg) scale(1.08); }
+      100% { opacity: 0; transform: translate(60vw, 10px) rotate(-4deg) scale(0.92); }
+    }
+
+    @keyframes eraserUltimate {
+      0% { opacity: 0; transform: translate(0, -8px) rotate(-8deg) scale(0.65); }
+      18% { opacity: 1; }
+      62% { opacity: 1; transform: translate(42vw, -8px) rotate(4deg) scale(1.14); }
+      100% { opacity: 0; transform: translate(58vw, -8px) rotate(7deg) scale(1); }
+    }
+
+    @keyframes washerUltimate {
+      0% { opacity: 0; transform: translate(0, -8px) rotate(0deg) scale(0.55); }
+      18% { opacity: 1; transform: translate(12vw, -4px) rotate(90deg) scale(1); }
+      76% { opacity: 1; transform: translate(43vw, -2px) rotate(540deg) scale(1.16); }
+      100% { opacity: 0; transform: translate(58vw, -22px) rotate(720deg) scale(0.8); }
+    }
+
+    @keyframes printUltimate {
+      0% { opacity: 0; transform: translate(0, -70px) rotate(-10deg) scale(0.65); }
+      20% { opacity: 1; }
+      74% { opacity: 1; transform: translate(42vw, 20px) rotate(9deg) scale(1.12); }
+      100% { opacity: 0; transform: translate(58vw, 70px) rotate(18deg) scale(0.82); }
+    }
+
+    @keyframes bagPushUltimate {
+      0% { opacity: 0; transform: translate(0, 12px) scale(0.65); }
+      18% { opacity: 1; }
+      72% { opacity: 1; transform: translate(43vw, 12px) scale(1.15); }
+      100% { opacity: 0; transform: translate(58vw, 12px) scale(0.95); }
+    }
+
+    @keyframes bossBlastedSpin {
+      0% { transform: translateX(0) rotate(0deg) scale(1) skew(0deg); filter: none; opacity: 1; }
+      24% { transform: translateX(-12px) rotate(-8deg) scale(1.12); filter: brightness(1.5); }
+      100% { transform: translateX(240px) translateY(35px) rotate(720deg) scale(0.35); opacity: 0; }
+    }
+
+    @keyframes bossBlastedUp {
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+      25% { transform: translateY(18px) rotate(8deg) scale(1.1); filter: brightness(1.45); }
+      100% { transform: translateY(-260px) rotate(-360deg) scale(0.28); opacity: 0; }
+    }
+
+    @keyframes bossBlastedSkew {
+      0% { transform: translateX(0) skewX(0deg) scale(1); opacity: 1; }
+      22% { transform: translateX(-10px) skewX(25deg) scale(1.35, 0.78); filter: brightness(1.6); }
+      100% { transform: translateX(230px) rotate(240deg) skewX(-12deg) scale(0.3); opacity: 0; }
+    }
+
+    @keyframes bossBlastedCrash {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      30% { transform: translateY(42px) scale(1.45, 0.34); filter: brightness(1.45); }
+      62% { transform: translateY(-34px) scale(0.8, 1.25); }
+      100% { transform: translateY(50px) scale(0); opacity: 0; }
+    }
+
+    @keyframes bossBlastedBounce {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+      34% { transform: translate(160px, -120px) rotate(180deg) scale(0.82); filter: brightness(1.5); }
+      58% { transform: translate(205px, 24px) rotate(260deg) scale(0.68); }
+      100% { transform: translate(285px, 88px) rotate(420deg) scale(0.28); opacity: 0; }
+    }
+
+    @keyframes bossBlastedAura {
+      0% { transform: scale(1); filter: none; opacity: 1; }
+      28% { transform: scale(1.32); filter: brightness(1.75) saturate(1.6); }
+      100% { transform: scale(0.05); filter: blur(4px); opacity: 0; }
+    }
+
+    @keyframes bossGloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      35% { transform: translateY(-8px) scale(1.08); }
+      70% { transform: translateY(0) scale(1.03); }
+    }
+
+    @keyframes smokeMulti {
+      0% { box-shadow: 22px 5px 0 #e1e5ec, -12px 10px 0 #b8bfcc; }
+      100% { box-shadow: 34px -14px 0 #e1e5ec, -30px -9px 0 #b8bfcc, 4px -28px 0 #d9dee8; }
+    }
+
+    @keyframes puffText {
+      0% { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.86); }
+      25%, 76% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.08); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(1); }
+    }
+
+    @keyframes answerBurst {
+      0% { opacity: 0; transform: translateY(-8px) scale(0.96); }
+      18% { opacity: 1; transform: translateY(0) scale(1.02); }
+      72% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-8px) scale(0.98); }
+    }
+
+    @keyframes cardCorrectPop {
+      0%, 100% { transform: translateY(0) scale(1); }
+      35% { transform: translateY(-2px) scale(1.012); }
+    }
+
+    @keyframes cardWrongShake {
+      0%, 100% { transform: translateX(0); }
+      18% { transform: translateX(-5px); }
+      36% { transform: translateX(5px); }
+      54% { transform: translateX(-3px); }
+      72% { transform: translateX(3px); }
+    }
+
+    @keyframes battleCorrectFlash {
+      0%, 100% { background-color: transparent; }
+      35% { background-color: rgba(103, 212, 119, 0.14); }
+    }
+
+    @keyframes battleWrongFlash {
+      0%, 100% { background-color: transparent; }
+      35% { background-color: rgba(255, 159, 69, 0.14); }
+    }
+
+    @keyframes correctGlow {
+      0%, 100% { filter: brightness(1); }
+      45% { filter: brightness(1.35) drop-shadow(0 0 14px #67d477); }
+    }
+
+    @keyframes wrongShake {
+      0%, 100% { transform: translateX(0); }
+      22% { transform: translateX(-7px); }
+      44% { transform: translateX(7px); }
+      66% { transform: translateX(-4px); }
+      82% { transform: translateX(4px); }
+    }
+
+    @keyframes particleFly {
+      0% { opacity: 0; transform: translate(0, 0) scale(0.6) rotate(0deg); }
+      16% { opacity: 1; }
+      100% { opacity: 0; transform: translate(var(--dx, 80px), var(--dy, -90px)) scale(1.15) rotate(var(--rot, 180deg)); }
+    }
+
+    @keyframes particleBurst {
+      0% { opacity: 0; transform: translate(0, 0) scale(0.5) rotate(0deg); }
+      18% { opacity: 1; }
+      100% { opacity: 0; transform: translate(var(--dx, 120px), var(--dy, -120px)) scale(1.35) rotate(var(--rot, 360deg)); }
+    }
+
+    @keyframes smokeFloat {
+      0% { opacity: 0; transform: translate(0, 20px) scale(0.55); }
+      24% { opacity: 0.9; }
+      100% { opacity: 0; transform: translate(var(--dx, 40px), var(--dy, -70px)) scale(1.8); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        padding: 14px;
+      }
+
+      .level-nav {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .arena {
+        grid-template-columns: 1fr 0.75fr 1fr;
+        min-height: 160px;
+        padding: 14px 8px;
+      }
+
+      .boss-choices {
+        grid-template-columns: 1fr;
+      }
+
+      .crop-work {
+        grid-template-columns: 1fr;
+      }
+
+      .crop-canvas-wrap {
+        width: min(220px, 100%);
+        height: auto;
+        aspect-ratio: 1;
+        justify-self: center;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .sentence {
+        padding: 16px 10px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .level-nav {
+        grid-template-columns: 1fr;
+      }
+
+      .arena {
+        gap: 5px;
+        padding: 8px 4px;
+        min-height: 138px;
+      }
+
+      .boss-card {
+        padding: 8px;
+        gap: 7px;
+      }
+
+      .boss-tools,
+      .battle-options {
+        justify-content: flex-start;
+      }
+
+      .hero-name,
+      .boss-name {
+        font-size: 0.82rem;
+      }
+
+      .vs-mark {
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+      }
+
+      .boss-message {
+        min-height: 32px;
+        max-height: 3.4em;
+        font-size: 0.82rem;
+        padding: 6px 8px;
+      }
+
+      .boss-question .japanese {
+        padding: 3px 6px;
+        font-size: 0.92rem;
+      }
+
+      .boss-question .question-type {
+        padding: 3px 6px;
+        font-size: 0.92rem;
+      }
+
+      .answer-burst {
+        right: 6px;
+        top: 6px;
+        max-width: calc(100vw - 28px);
+        padding: 6px 9px;
+      }
+
+      .boss-sentence {
+        font-size: clamp(1rem, 6vw, 1.45rem);
+      }
+
+      .stats {
+        align-items: stretch;
+      }
+
+      .pill {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-row">
+        <div>
+          <h1>えいご これ・あれ クイズ</h1>
+          <p class="subtitle">be動詞・答え方・a/an をステージバトルで練習しよう</p>
+        </div>
+        <div class="level-badge" id="levelBadge">レベル1：選ぶ</div>
+      </div>
+      <nav class="level-nav" aria-label="レベルを選ぶ">
+        <button class="level-button active" data-level="1">レベル1：スライム</button>
+        <button class="level-button" data-level="2">レベル2：コウモリ</button>
+        <button class="level-button" data-level="3">レベル3：ゴーレム</button>
+        <button class="level-button" data-level="4">レベル4：ドラゴン</button>
+        <button class="level-button" data-level="5">レベル5：a/an</button>
+        <button class="level-button" data-level="6">レベル6：大王</button>
+        <button class="mode-button" id="bossModeButton" type="button">れんしゅう</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="status-card" id="statusCard" aria-live="polite">
+        <div class="stats">
+          <span class="pill" id="questionCounter">1 / 5 問</span>
+          <span class="pill" id="scoreCounter">正解 0</span>
+          <span class="pill" id="modeHint">選んで答えよう</span>
+        </div>
+        <div class="progress" aria-label="進みぐあい">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </section>
+
+      <section class="quiz-card" id="quizCard">
+        <p class="question-type" id="questionText"></p>
+        <p class="japanese" id="japaneseMeaning"></p>
+        <p class="sentence" id="sentence"></p>
+        <div class="choices" id="choices"></div>
+        <div class="model-answer" id="modelAnswer"></div>
+        <div class="feedback" id="feedback"></div>
+        <p class="explanation" id="explanation"></p>
+        <div class="actions" id="actions"></div>
+      </section>
+
+      <section class="result-card" id="resultCard" aria-live="polite">
+        <h2 class="result-title" id="resultTitle"></h2>
+        <p class="result-score" id="resultScore"></p>
+        <p class="explanation show" id="resultMessage"></p>
+        <div class="actions">
+          <button class="action-button success" id="retryLevelButton">もう一度やる</button>
+          <button class="action-button" id="nextLevelButton">次のレベルへ</button>
+        </div>
+      </section>
+
+      <section class="summary-card status-card" id="summaryCard" aria-label="まとめ">
+        <h2 class="summary-title">まとめ</h2>
+        <div class="summary-grid">
+          <div class="summary-item">I は am と仲よし。</div>
+          <div class="summary-item">you は are と仲よし。</div>
+          <div class="summary-item">he / she は is と仲よし。</div>
+          <div class="summary-item">they は 2人以上・2つ以上なので are。</div>
+          <div class="summary-item">this / that は 1つなので is。</div>
+          <div class="summary-item">these / those は 2つ以上なので are。</div>
+          <div class="summary-item">this / that の答えは it。</div>
+          <div class="summary-item">these / those の答えは they。</div>
+          <div class="summary-item">they はそのまま they で答える。</div>
+          <div class="summary-item">Are you ...? は Yes, I am. / No, I’m not.</div>
+          <div class="summary-item">1つなら a / an。2つ以上なら s。</div>
+          <div class="summary-item">my / your があるときは a / an はなし。</div>
+        </div>
+      </section>
+
+      <section class="boss-card hidden" id="bossBattleCard" aria-live="polite">
+        <div class="boss-top">
+          <div>
+            <h2 class="boss-title" id="battleTitle">ステージバトル</h2>
+            <p class="subtitle" id="battleSubtitle">5問全問正解で、敵に必殺技！</p>
+          </div>
+          <div class="boss-tools">
+            <label class="photo-upload">
+              主人公の顔
+              <input type="file" id="faceUpload" accept="image/*">
+            </label>
+            <label class="photo-upload">
+              ボスの顔
+              <input type="file" id="bossFaceUpload" accept="image/*">
+            </label>
+            <div class="battle-options">
+              <label><input type="checkbox" id="autoNextToggle" checked> 自動で次へ</label>
+              <label><input type="checkbox" id="slowNextToggle"> 解説ゆっくり</label>
+              <label><input type="checkbox" id="shortFxToggle"> 演出短め</label>
+              <label><input type="checkbox" id="soundToggle"> 音</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="arena" id="arena">
+          <div class="particle-layer" id="particleLayer"></div>
+          <div class="answer-burst" id="answerBurst"></div>
+          <div class="beam" id="bossBeam"></div>
+          <img class="ultimate-beam-image" id="ultimateBeamImage" src="assets/effects/ultimate-beam.png" alt="" aria-hidden="true">
+          <div class="smoke" id="bossSmoke"></div>
+          <div class="puff-text" id="puffText">プスン……</div>
+
+          <div class="hero-wrap">
+            <div class="hero-character hero-pose-idle" id="heroCharacter">
+              <img class="hero-art" id="heroArt" alt="" src="assets/hero/poses/hero-idle.png" aria-hidden="true">
+              <img class="hero-face" id="heroFace" alt="主人公の顔" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23ffd7b5'/%3E%3Ccircle cx='42' cy='50' r='8' fill='%23243047'/%3E%3Ccircle cx='78' cy='50' r='8' fill='%23243047'/%3E%3Cpath d='M42 78 Q60 92 78 78' fill='none' stroke='%23243047' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E">
+              <div class="hero-body" aria-hidden="true"></div>
+            </div>
+            <p class="hero-name">えいご勇者</p>
+          </div>
+
+          <div class="vs-panel">
+            <div class="vs-mark">VS</div>
+            <div class="boss-stats">
+              <div class="stats">
+                <span class="pill" id="bossQuestionCounter">1 / 5 問</span>
+                <span class="pill" id="bossScoreCounter">正解 0</span>
+                <span class="pill" id="specialGaugeText">必殺技ゲージ 0%</span>
+              </div>
+              <div class="boss-meter-row" aria-label="必殺技ゲージ">
+                <div class="special-meter">
+                  <div class="special-meter-fill" id="specialGaugeFill"></div>
+                </div>
+              </div>
+              <div class="charge-text" id="chargeText"></div>
+            </div>
+          </div>
+
+          <div class="boss-wrap">
+            <div class="boss-monster" id="bossMonster" aria-hidden="true">
+              <div class="boss-aura"></div>
+              <img class="boss-face-img" id="bossFace" alt="">
+              <div class="boss-mouth"></div>
+            </div>
+            <p class="boss-name" id="bossName">ごちゃまぜ大王</p>
+          </div>
+        </div>
+
+        <div class="boss-question" id="bossQuestionBox">
+          <p class="question-type" id="bossQuestionText">ボスの問題にこたえよう</p>
+          <p class="japanese" id="bossJapanese"></p>
+          <p class="boss-sentence" id="bossSentence"></p>
+          <div class="boss-choices" id="bossChoices"></div>
+        </div>
+
+        <div class="final-call" id="bossFinalCall"></div>
+        <div class="boss-message" id="bossMessage">顔写真をえらぶと、主人公の顔になります。この画像は送信されません。</div>
+        <div class="boss-actions" id="bossActions">
+          <button class="action-button retry hidden" id="bossRetryButton" type="button">もう一回</button>
+          <button class="action-button success hidden" id="bossNextLevelButton" type="button">次のレベルへ</button>
+        </div>
+
+        <div class="crop-panel" id="cropPanel">
+          <p class="crop-title" id="cropTitle">顔の位置を合わせよう</p>
+          <div class="crop-work">
+            <div class="crop-canvas-wrap">
+              <canvas id="cropCanvas" width="360" height="360"></canvas>
+            </div>
+            <div class="crop-controls">
+              <label>
+                拡大・縮小
+                <input type="range" id="cropScale" min="0.6" max="3" step="0.01" value="1">
+              </label>
+              <p class="japanese">丸の中に顔が入るように、写真をドラッグして動かせます。決定後、この端末の画面だけで使います。</p>
+              <div class="crop-buttons">
+                <button class="action-button success" id="cropApplyButton" type="button">この顔で決定</button>
+                <button class="action-button light" id="cropResetButton" type="button">リセット</button>
+                <button class="action-button retry" id="cropCancelButton" type="button">やめる</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const levelNames = {
+      1: "レベル1：選ぶ",
+      2: "レベル2：疑問文",
+      3: "レベル3：答え方",
+      4: "レベル4：音読",
+      5: "レベル5：a/an 複数形",
+      6: "レベル6：ごちゃまぜ"
+    };
+
+    const questions = [
+      {
+        id: "l1-this-is-pencil",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "This ___ a pencil.",
+        japaneseMeaning: "これは えんぴつです。",
+        choices: ["am", "is", "are"],
+        answer: "is",
+        explanation: "this は「近くの1つ」。1つなので is を使います。"
+      },
+      {
+        id: "l1-that-is-desk",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "That ___ a desk.",
+        japaneseMeaning: "あれは つくえです。",
+        choices: ["am", "is", "are"],
+        answer: "is",
+        explanation: "that は「遠くの1つ」。1つなので is を使います。"
+      },
+      {
+        id: "l1-these-are-apples",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "These ___ apples.",
+        japaneseMeaning: "これらは りんごです。",
+        choices: ["am", "is", "are"],
+        answer: "are",
+        explanation: "these は「近くの2つ以上」。2つ以上なので are を使います。"
+      },
+      {
+        id: "l1-those-are-books",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "Those ___ books.",
+        japaneseMeaning: "あれらは 本です。",
+        choices: ["am", "is", "are"],
+        answer: "are",
+        explanation: "those は「遠くの2つ以上」。2つ以上なので are を使います。"
+      },
+      {
+        id: "l1-pick-this",
+        level: 1,
+        type: "choice",
+        questionText: "英語に合う言葉を選ぼう",
+        sentenceHtml: "___ is a pencil.",
+        japaneseMeaning: "これは えんぴつです。",
+        choices: ["This", "That", "These", "Those"],
+        answer: "This",
+        explanation: "「これは」は This。文のはじめなので大文字です。"
+      },
+      {
+        id: "l1-pick-that",
+        level: 1,
+        type: "choice",
+        questionText: "英語に合う言葉を選ぼう",
+        sentenceHtml: "___ is a desk.",
+        japaneseMeaning: "あれは つくえです。",
+        choices: ["This", "That", "These", "Those"],
+        answer: "That",
+        explanation: "「あれは」は That。1つのものに使います。"
+      },
+      {
+        id: "l1-pick-these",
+        level: 1,
+        type: "choice",
+        questionText: "英語に合う言葉を選ぼう",
+        sentenceHtml: "___ are apples.",
+        japaneseMeaning: "これらは りんごです。",
+        choices: ["This", "That", "These", "Those"],
+        answer: "These",
+        explanation: "「これらは」は These。近くの2つ以上に使います。"
+      },
+      {
+        id: "l1-pick-those",
+        level: 1,
+        type: "choice",
+        questionText: "英語に合う言葉を選ぼう",
+        sentenceHtml: "___ are books.",
+        japaneseMeaning: "あれらは 本です。",
+        choices: ["This", "That", "These", "Those"],
+        answer: "Those",
+        explanation: "「あれらは」は Those。遠くの2つ以上に使います。"
+      },
+      {
+        id: "l1-i-am-happy",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "I ___ happy.",
+        japaneseMeaning: "わたしは うれしいです。",
+        choices: ["am", "are", "is"],
+        answer: "am",
+        explanation: "I は am と仲よし。"
+      },
+      {
+        id: "l1-you-are-happy",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "You ___ happy.",
+        japaneseMeaning: "あなたは うれしいです。",
+        choices: ["am", "are", "is"],
+        answer: "are",
+        explanation: "you は are と仲よし。"
+      },
+      {
+        id: "l1-he-is-happy",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "He ___ happy.",
+        japaneseMeaning: "かれは うれしいです。",
+        choices: ["am", "are", "is"],
+        answer: "is",
+        explanation: "he は is と仲よし。"
+      },
+      {
+        id: "l1-she-is-happy",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "She ___ happy.",
+        japaneseMeaning: "かのじょは うれしいです。",
+        choices: ["am", "are", "is"],
+        answer: "is",
+        explanation: "she は is と仲よし。"
+      },
+      {
+        id: "l1-they-are-happy",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "They ___ happy.",
+        japaneseMeaning: "かれらは うれしいです。",
+        choices: ["am", "are", "is"],
+        answer: "are",
+        explanation: "they は 2人以上・2つ以上なので are。"
+      },
+      {
+        id: "l1-i-am-student",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "I ___ a student.",
+        japaneseMeaning: "わたしは 生徒です。",
+        choices: ["am", "are", "is"],
+        answer: "am",
+        explanation: "I は am と仲よし。"
+      },
+      {
+        id: "l1-you-are-friend",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "You ___ my friend.",
+        japaneseMeaning: "あなたは わたしの友だちです。",
+        choices: ["am", "are", "is"],
+        answer: "are",
+        explanation: "you は are と仲よし。"
+      },
+      {
+        id: "l1-he-is-brother",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "He ___ my brother.",
+        japaneseMeaning: "かれは わたしの兄弟です。",
+        choices: ["am", "are", "is"],
+        answer: "is",
+        explanation: "he は is と仲よし。"
+      },
+      {
+        id: "l1-she-is-sister",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "She ___ my sister.",
+        japaneseMeaning: "かのじょは わたしの姉妹です。",
+        choices: ["am", "are", "is"],
+        answer: "is",
+        explanation: "she は is と仲よし。"
+      },
+      {
+        id: "l1-they-are-students",
+        level: 1,
+        type: "choice",
+        questionText: "空らんに入る言葉を選ぼう",
+        sentenceHtml: "They ___ students.",
+        japaneseMeaning: "かれらは 生徒です。",
+        choices: ["am", "are", "is"],
+        answer: "are",
+        explanation: "they は 2人以上・2つ以上なので are。"
+      },
+      {
+        id: "l2-is-this-pencil",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ this a pencil?",
+        japaneseMeaning: "これは えんぴつですか。",
+        choices: ["Is", "Are", "Am"],
+        answer: "Is",
+        explanation: "this は1つ。疑問文では Is を前に出します。"
+      },
+      {
+        id: "l2-is-that-desk",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ that a desk?",
+        japaneseMeaning: "あれは つくえですか。",
+        choices: ["Is", "Are", "Am"],
+        answer: "Is",
+        explanation: "that は1つ。文のはじめなので Is です。"
+      },
+      {
+        id: "l2-are-these-apples",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ these apples?",
+        japaneseMeaning: "これらは りんごですか。",
+        choices: ["Is", "Are", "Am"],
+        answer: "Are",
+        explanation: "these は2つ以上。疑問文では Are を前に出します。"
+      },
+      {
+        id: "l2-are-those-books",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ those books?",
+        japaneseMeaning: "あれらは 本ですか。",
+        choices: ["Is", "Are", "Am"],
+        answer: "Are",
+        explanation: "those は2つ以上。文のはじめなので Are です。"
+      },
+      {
+        id: "l2-is-this-eraser",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ this an eraser?",
+        japaneseMeaning: "これは けしゴムですか。",
+        choices: ["Is", "Are", "Am"],
+        answer: "Is",
+        explanation: "this は1つなので Is を使います。"
+      },
+      {
+        id: "l2-are-these-pens",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ these pens?",
+        japaneseMeaning: "これらは ペンですか。",
+        choices: ["Is", "Are", "Am"],
+        answer: "Are",
+        explanation: "these は2つ以上なので Are を使います。"
+      },
+      {
+        id: "l2-am-i-happy",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ I happy?",
+        japaneseMeaning: "わたしは うれしいですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Am",
+        explanation: "I の質問は Am を文のはじめに出します。"
+      },
+      {
+        id: "l2-are-you-happy",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ you happy?",
+        japaneseMeaning: "あなたは うれしいですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Are",
+        explanation: "you は are と仲よし。文のはじめなので Are です。"
+      },
+      {
+        id: "l2-is-he-happy",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ he happy?",
+        japaneseMeaning: "かれは うれしいですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Is",
+        explanation: "he は is と仲よし。文のはじめなので Is です。"
+      },
+      {
+        id: "l2-is-she-happy",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ she happy?",
+        japaneseMeaning: "かのじょは うれしいですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Is",
+        explanation: "she は is と仲よし。文のはじめなので Is です。"
+      },
+      {
+        id: "l2-are-they-happy",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ they happy?",
+        japaneseMeaning: "かれらは うれしいですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Are",
+        explanation: "they は are と仲よし。文のはじめなので Are です。"
+      },
+      {
+        id: "l2-am-i-student",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ I a student?",
+        japaneseMeaning: "わたしは 生徒ですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Am",
+        explanation: "I は am と仲よし。文のはじめなので Am です。"
+      },
+      {
+        id: "l2-are-you-friend",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ you my friend?",
+        japaneseMeaning: "あなたは わたしの友だちですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Are",
+        explanation: "you は are と仲よし。文のはじめなので Are です。"
+      },
+      {
+        id: "l2-is-he-brother",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ he my brother?",
+        japaneseMeaning: "かれは わたしの兄弟ですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Is",
+        explanation: "he は is と仲よし。文のはじめなので Is です。"
+      },
+      {
+        id: "l2-is-she-sister",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ she my sister?",
+        japaneseMeaning: "かのじょは わたしの姉妹ですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Is",
+        explanation: "she は is と仲よし。文のはじめなので Is です。"
+      },
+      {
+        id: "l2-are-they-students",
+        level: 2,
+        type: "choice",
+        questionText: "疑問文のはじめを選ぼう",
+        sentenceHtml: "___ they students?",
+        japaneseMeaning: "かれらは 生徒ですか。",
+        choices: ["Am", "Are", "Is"],
+        answer: "Are",
+        explanation: "they は 2人以上・2つ以上なので Are。"
+      },
+      {
+        id: "l3-yes-it-is",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Is this a pencil?<br>Yes, ___ ___.",
+        japaneseMeaning: "これは えんぴつですか。はい、そうです。",
+        choices: ["it is", "they are", "it isn’t", "they aren’t"],
+        answer: "it is",
+        explanation: "this の答えでは it を使います。Yes なら it is です。"
+      },
+      {
+        id: "l3-no-it-isnt",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Is that a desk?<br>No, it ___.",
+        japaneseMeaning: "あれは つくえですか。いいえ、ちがいます。",
+        choices: ["isn’t", "aren’t", "is", "are"],
+        answer: "isn’t",
+        explanation: "that の答えでは it を使います。No なら it isn’t です。"
+      },
+      {
+        id: "l3-yes-they-are",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Are these apples?<br>Yes, ___ ___.",
+        japaneseMeaning: "これらは りんごですか。はい、そうです。",
+        choices: ["it is", "they are", "it isn’t", "they aren’t"],
+        answer: "they are",
+        explanation: "these の答えでは they を使います。Yes なら they are です。"
+      },
+      {
+        id: "l3-no-they-arent",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Are those books?<br>No, they ___.",
+        japaneseMeaning: "あれらは 本ですか。いいえ、ちがいます。",
+        choices: ["isn’t", "aren’t", "is", "are"],
+        answer: "aren’t",
+        explanation: "those の答えでは they を使います。No なら they aren’t です。"
+      },
+      {
+        id: "l3-yes-that-it",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Is that a desk?<br>Yes, ___ ___.",
+        japaneseMeaning: "あれは つくえですか。はい、そうです。",
+        choices: ["it is", "they are", "it isn’t", "they aren’t"],
+        answer: "it is",
+        explanation: "that は1つなので、答えでは it を使います。"
+      },
+      {
+        id: "l3-no-these-they",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Are these apples?<br>No, they ___.",
+        japaneseMeaning: "これらは りんごですか。いいえ、ちがいます。",
+        choices: ["isn’t", "aren’t", "is", "are"],
+        answer: "aren’t",
+        explanation: "these は2つ以上なので、答えでは they を使います。"
+      },
+      {
+        id: "l3-yes-i-am",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Am I happy?<br>Yes, ___ ___.",
+        japaneseMeaning: "わたしは うれしいですか。はい、そうです。",
+        choices: ["I am", "he is", "she is", "they are"],
+        answer: "I am",
+        explanation: "I は am と仲よし。Yes なら I am です。"
+      },
+      {
+        id: "l3-no-i-am-not",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Am I happy?<br>No, ___ ___.",
+        japaneseMeaning: "わたしは うれしいですか。いいえ、ちがいます。",
+        choices: ["I’m not", "he isn’t", "she isn’t", "they aren’t"],
+        answer: "I’m not",
+        explanation: "Am I の No は I’m not です。"
+      },
+      {
+        id: "l3-yes-you-are",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Are you happy?<br>Yes, ___ ___.",
+        japaneseMeaning: "あなたは うれしいですか。はい、そうです。",
+        choices: ["I am", "he is", "she is", "they are"],
+        answer: "I am",
+        explanation: "you で聞かれたら、答える人は「私」なので I am で答えます。"
+      },
+      {
+        id: "l3-no-you-arent",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Are you happy?<br>No, ___ ___.",
+        japaneseMeaning: "あなたは うれしいですか。いいえ、ちがいます。",
+        choices: ["I’m not", "he isn’t", "she isn’t", "they aren’t"],
+        answer: "I’m not",
+        explanation: "聞かれた人が答えるので、No, I’m not. になります。"
+      },
+      {
+        id: "l3-yes-you-friend-i-am",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Are you my friend?<br>Yes, ___ ___.",
+        japaneseMeaning: "あなたは わたしの友だちですか。はい、そうです。",
+        choices: ["I am", "he is", "she is", "they are"],
+        answer: "I am",
+        explanation: "you で聞かれたら、答える人は「私」なので I am で答えます。"
+      },
+      {
+        id: "l3-no-you-friend-im-not",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Are you my friend?<br>No, ___ ___.",
+        japaneseMeaning: "あなたは わたしの友だちですか。いいえ、ちがいます。",
+        choices: ["I’m not", "he isn’t", "she isn’t", "they aren’t"],
+        answer: "I’m not",
+        explanation: "聞かれた人が答えるので、No, I’m not. になります。"
+      },
+      {
+        id: "l3-yes-he-is",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Is he happy?<br>Yes, ___ ___.",
+        japaneseMeaning: "かれは うれしいですか。はい、そうです。",
+        choices: ["I am", "you are", "he is", "they are"],
+        answer: "he is",
+        explanation: "he は is と仲よし。Yes なら he is です。"
+      },
+      {
+        id: "l3-no-he-isnt",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Is he happy?<br>No, he ___.",
+        japaneseMeaning: "かれは うれしいですか。いいえ、ちがいます。",
+        choices: ["isn’t", "aren’t", "is", "are"],
+        answer: "isn’t",
+        explanation: "he は is と仲よし。No なら he isn’t です。"
+      },
+      {
+        id: "l3-yes-she-is",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Is she happy?<br>Yes, ___ ___.",
+        japaneseMeaning: "かのじょは うれしいですか。はい、そうです。",
+        choices: ["I am", "you are", "she is", "they are"],
+        answer: "she is",
+        explanation: "she は is と仲よし。Yes なら she is です。"
+      },
+      {
+        id: "l3-no-she-isnt",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Is she happy?<br>No, she ___.",
+        japaneseMeaning: "かのじょは うれしいですか。いいえ、ちがいます。",
+        choices: ["isn’t", "aren’t", "is", "are"],
+        answer: "isn’t",
+        explanation: "she は is と仲よし。No なら she isn’t です。"
+      },
+      {
+        id: "l3-yes-they-are-happy",
+        level: 3,
+        type: "choice",
+        questionText: "Yes の答え方を選ぼう",
+        sentenceHtml: "Are they happy?<br>Yes, ___ ___.",
+        japaneseMeaning: "かれらは うれしいですか。はい、そうです。",
+        choices: ["I am", "you are", "he is", "they are"],
+        answer: "they are",
+        explanation: "they はそのまま they で答えます。Yes なら they are です。"
+      },
+      {
+        id: "l3-no-they-arent-happy",
+        level: 3,
+        type: "choice",
+        questionText: "No の答え方を選ぼう",
+        sentenceHtml: "Are they happy?<br>No, they ___.",
+        japaneseMeaning: "かれらは うれしいですか。いいえ、ちがいます。",
+        choices: ["aren’t", "isn’t", "am", "are"],
+        answer: "aren’t",
+        explanation: "they は are と仲よし。No なら they aren’t です。"
+      },
+      {
+        id: "l4-this-pencil",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Is this a pencil?",
+        japaneseMeaning: "これは えんぴつですか。",
+        modelAnswers: ["Yes, it is.", "No, it isn’t."],
+        explanation: "this は1つなので、答えでは it を使います。"
+      },
+      {
+        id: "l4-that-desk",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Is that a desk?",
+        japaneseMeaning: "あれは つくえですか。",
+        modelAnswers: ["Yes, it is.", "No, it isn’t."],
+        explanation: "that は1つなので、答えでは it を使います。"
+      },
+      {
+        id: "l4-these-apples",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Are these apples?",
+        japaneseMeaning: "これらは りんごですか。",
+        modelAnswers: ["Yes, they are.", "No, they aren’t."],
+        explanation: "these は2つ以上なので、答えでは they を使います。"
+      },
+      {
+        id: "l4-those-books",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Are those books?",
+        japaneseMeaning: "あれらは 本ですか。",
+        modelAnswers: ["Yes, they are.", "No, they aren’t."],
+        explanation: "those は2つ以上なので、答えでは they を使います。"
+      },
+      {
+        id: "l4-these-pens",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Are these pens?",
+        japaneseMeaning: "これらは ペンですか。",
+        modelAnswers: ["Yes, they are.", "No, they aren’t."],
+        explanation: "these は2つ以上なので、they are / they aren’t で答えます。"
+      },
+      {
+        id: "l4-am-i-happy",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Am I happy?",
+        japaneseMeaning: "わたしは うれしいですか。",
+        modelAnswers: ["Yes, I am.", "No, I’m not."],
+        explanation: "I は am と仲よし。No は I’m not です。"
+      },
+      {
+        id: "l4-are-you-happy",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Are you happy?",
+        japaneseMeaning: "あなたは うれしいですか。",
+        modelAnswers: ["Yes, I am.", "No, I’m not."],
+        explanation: "you で聞かれたら、答える人は「私」なので I am で答えます。"
+      },
+      {
+        id: "l4-is-he-happy",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Is he happy?",
+        japaneseMeaning: "かれは うれしいですか。",
+        modelAnswers: ["Yes, he is.", "No, he isn’t."],
+        explanation: "he は is と仲よし。"
+      },
+      {
+        id: "l4-is-she-happy",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Is she happy?",
+        japaneseMeaning: "かのじょは うれしいですか。",
+        modelAnswers: ["Yes, she is.", "No, she isn’t."],
+        explanation: "she は is と仲よし。"
+      },
+      {
+        id: "l4-are-they-happy",
+        level: 4,
+        type: "speaking",
+        questionText: "こえに出して答えよう",
+        sentenceHtml: "Are they happy?",
+        japaneseMeaning: "かれらは うれしいですか。",
+        modelAnswers: ["Yes, they are.", "No, they aren’t."],
+        explanation: "they はそのまま they で答えます。"
+      },
+      {
+        id: "l5-aan-this-pen",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "This is ___ pen.",
+        japaneseMeaning: "これは ペンです。",
+        choices: ["a", "an", "なし"],
+        answer: "a",
+        explanation: "1つのものには a をつけます。pen は a pen です。"
+      },
+      {
+        id: "l5-aan-this-apple",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "This is ___ apple.",
+        japaneseMeaning: "これは りんごです。",
+        choices: ["a", "an", "なし"],
+        answer: "an",
+        explanation: "apple は母音ではじまるので an apple です。"
+      },
+      {
+        id: "l5-aan-that-egg",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "That is ___ egg.",
+        japaneseMeaning: "あれは たまごです。",
+        choices: ["a", "an", "なし"],
+        answer: "an",
+        explanation: "egg は母音ではじまるので an egg です。"
+      },
+      {
+        id: "l5-aan-that-book",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "That is ___ book.",
+        japaneseMeaning: "あれは 本です。",
+        choices: ["a", "an", "なし"],
+        answer: "a",
+        explanation: "1つのものには a をつけます。book は a book です。"
+      },
+      {
+        id: "l5-none-these-pens",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "These are ___ pens.",
+        japaneseMeaning: "これらは ペンです。",
+        choices: ["a", "an", "なし"],
+        answer: "なし",
+        explanation: "2つ以上なら a/an はつけません。pens のままでOKです。"
+      },
+      {
+        id: "l5-none-those-apples",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "Those are ___ apples.",
+        japaneseMeaning: "あれらは りんごです。",
+        choices: ["a", "an", "なし"],
+        answer: "なし",
+        explanation: "2つ以上なら a/an はつけません。apples のままでOKです。"
+      },
+      {
+        id: "l5-none-this-my-pen",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "This is ___ my pen.",
+        japaneseMeaning: "これは わたしのペンです。",
+        choices: ["a", "an", "なし"],
+        answer: "なし",
+        explanation: "my があるときは a/an はつけません。This is my pen. です。"
+      },
+      {
+        id: "l5-none-this-your-book",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "This is ___ your book.",
+        japaneseMeaning: "これは あなたの本です。",
+        choices: ["a", "an", "なし"],
+        answer: "なし",
+        explanation: "your があるときは a/an はつけません。This is your book. です。"
+      },
+      {
+        id: "l5-none-these-my-pens",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "These are ___ my pens.",
+        japaneseMeaning: "これらは わたしのペンです。",
+        choices: ["a", "an", "なし"],
+        answer: "なし",
+        explanation: "my があるときは a/an はつけません。these は2つ以上なので pens です。"
+      },
+      {
+        id: "l5-none-those-your-books",
+        level: 5,
+        type: "choice",
+        questionText: "a / an / なし を選ぼう",
+        sentenceHtml: "Those are ___ your books.",
+        japaneseMeaning: "あれらは あなたの本です。",
+        choices: ["a", "an", "なし"],
+        answer: "なし",
+        explanation: "your があるときは a/an はつけません。those は2つ以上なので books です。"
+      },
+      {
+        id: "l5-noun-these-pens",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "These are ___.",
+        japaneseMeaning: "これらは ペンです。",
+        choices: ["pen", "pens", "a pen"],
+        answer: "pens",
+        explanation: "these は2つ以上なので pens のように s がつきます。"
+      },
+      {
+        id: "l5-noun-this-a-pen",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "This is ___.",
+        japaneseMeaning: "これは ペンです。",
+        choices: ["pen", "pens", "a pen", "a pens"],
+        answer: "a pen",
+        explanation: "this は1つなので a pen です。a pens は使いません。"
+      },
+      {
+        id: "l5-noun-those-apples",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "Those are ___.",
+        japaneseMeaning: "あれらは りんごです。",
+        choices: ["apple", "apples", "an apples"],
+        answer: "apples",
+        explanation: "those は2つ以上なので apples のように s がつきます。"
+      },
+      {
+        id: "l5-noun-that-an-apple",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "That is ___.",
+        japaneseMeaning: "あれは りんごです。",
+        choices: ["apple", "apples", "an apple"],
+        answer: "an apple",
+        explanation: "that は1つ。apple は母音ではじまるので an apple です。"
+      },
+      {
+        id: "l5-poss-this-my-pen",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "This is ___.",
+        japaneseMeaning: "これは わたしのペンです。",
+        choices: ["my pen", "a my pen", "my pens"],
+        answer: "my pen",
+        explanation: "my があるときは a/an はつけません。1つなら my pen です。"
+      },
+      {
+        id: "l5-poss-these-my-pens",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "These are ___.",
+        japaneseMeaning: "これらは わたしのペンです。",
+        choices: ["my pen", "my pens", "a my pens"],
+        answer: "my pens",
+        explanation: "these は2つ以上。my があっても pens のように s がつきます。"
+      },
+      {
+        id: "l5-poss-that-your-book",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "That is ___.",
+        japaneseMeaning: "あれは あなたの本です。",
+        choices: ["your book", "a your book", "your books"],
+        answer: "your book",
+        explanation: "your があるときは a/an はつけません。1つなら your book です。"
+      },
+      {
+        id: "l5-poss-those-your-books",
+        level: 5,
+        type: "choice",
+        questionText: "正しい形を選ぼう",
+        sentenceHtml: "Those are ___.",
+        japaneseMeaning: "あれらは あなたの本です。",
+        choices: ["your book", "your books", "a your books"],
+        answer: "your books",
+        explanation: "those は2つ以上。your があっても books のように s がつきます。"
+      },
+      {
+        id: "l5-this-pencil",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "This is a pencil.",
+        japaneseMeaning: "これは えんぴつです。",
+        modelAnswers: ["This is a pencil."],
+        explanation: "this は近くの1つ。is を使います。"
+      },
+      {
+        id: "l5-that-desk",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "That is a desk.",
+        japaneseMeaning: "あれは つくえです。",
+        modelAnswers: ["That is a desk."],
+        explanation: "that は遠くの1つ。is を使います。"
+      },
+      {
+        id: "l5-these-apples",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "These are apples.",
+        japaneseMeaning: "これらは りんごです。",
+        modelAnswers: ["These are apples."],
+        explanation: "these は近くの2つ以上。are を使います。"
+      },
+      {
+        id: "l5-those-books",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Those are books.",
+        japaneseMeaning: "あれらは 本です。",
+        modelAnswers: ["Those are books."],
+        explanation: "those は遠くの2つ以上。are を使います。"
+      },
+      {
+        id: "l5-ask-this",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Is this a pencil?",
+        japaneseMeaning: "これは えんぴつですか。",
+        modelAnswers: ["Yes, it is.", "No, it isn’t."],
+        explanation: "this の質問は it で答えます。"
+      },
+      {
+        id: "l5-ask-that",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Is that a desk?",
+        japaneseMeaning: "あれは つくえですか。",
+        modelAnswers: ["Yes, it is.", "No, it isn’t."],
+        explanation: "that の質問も it で答えます。"
+      },
+      {
+        id: "l5-ask-these",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Are these apples?",
+        japaneseMeaning: "これらは りんごですか。",
+        modelAnswers: ["Yes, they are.", "No, they aren’t."],
+        explanation: "these の質問は they で答えます。"
+      },
+      {
+        id: "l5-ask-those",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Are those books?",
+        japaneseMeaning: "あれらは 本ですか。",
+        modelAnswers: ["Yes, they are.", "No, they aren’t."],
+        explanation: "those の質問も they で答えます。"
+      },
+      {
+        id: "l5-ask-i",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Am I happy?",
+        japaneseMeaning: "わたしは うれしいですか。",
+        modelAnswers: ["Yes, I am.", "No, I’m not."],
+        explanation: "I は am と仲よし。"
+      },
+      {
+        id: "l5-ask-you",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Are you happy?",
+        japaneseMeaning: "あなたは うれしいですか。",
+        modelAnswers: ["Yes, I am.", "No, I’m not."],
+        explanation: "you で聞かれたら、答える人は「私」なので I am で答えます。"
+      },
+      {
+        id: "l5-ask-he",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Is he happy?",
+        japaneseMeaning: "かれは うれしいですか。",
+        modelAnswers: ["Yes, he is.", "No, he isn’t."],
+        explanation: "he は is と仲よし。"
+      },
+      {
+        id: "l5-ask-she",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Is she happy?",
+        japaneseMeaning: "かのじょは うれしいですか。",
+        modelAnswers: ["Yes, she is.", "No, she isn’t."],
+        explanation: "she は is と仲よし。"
+      },
+      {
+        id: "l5-ask-they",
+        level: 6,
+        type: "speaking",
+        questionText: "まぜまぜ音読",
+        sentenceHtml: "Are they happy?",
+        japaneseMeaning: "かれらは うれしいですか。",
+        modelAnswers: ["Yes, they are.", "No, they aren’t."],
+        explanation: "they はそのまま they で答えます。"
+      }
+    ];
+
+    const state = {
+      currentLevel: 1,
+      round: [],
+      index: 0,
+      score: 0,
+      answered: false,
+      weakIds: JSON.parse(localStorage.getItem("englishGrammarWeakIds") || "[]")
+    };
+
+    const specialMoves = {
+      level1: [
+        { name: "I am 三連バースト", type: "washer" },
+        { name: "You are ほうきスイープ", type: "broom" },
+        { name: "I am ランドセルプッシュ", type: "bagPush" },
+        { name: "You are ロケットパンチ", type: "bagPush" },
+        { name: "He is サンダー消しゴム", type: "eraser" },
+        { name: "She is キラキラプリント", type: "print" },
+        { name: "They are くるまドーン", type: "car" },
+        { name: "They are なかよしアタック", type: "broom" },
+        { name: "I am えんぴつロケット", type: "pencilRocket" },
+        { name: "You are ランドセルプレス", type: "bagPush" },
+        { name: "He is 消しゴムローラー", type: "eraserRoller" },
+        { name: "She is キラキラ下じきビーム", type: "rulerSlash" },
+        { name: "They are うわばきダッシュ", type: "shoeDash" },
+        { name: "You are 黒板消しクラッシュ", type: "eraserRoller" },
+        { name: "This is ぞうきんスピン", type: "broom" },
+        { name: "I am 給食トレーシールド", type: "trayCannon" },
+        { name: "You are 水筒スプラッシュ", type: "waterBottleSplash" },
+        { name: "They are なわとびぐるぐる", type: "jumpRopeSpin" },
+        { name: "He is チョークミサイル", type: "chalkMissile" },
+        { name: "She is 連絡帳フラッシュ", type: "notebookFlash" },
+        { name: "This is お道具箱バースト", type: "print" },
+        { name: "I am えんぴつけずりタイフーン", type: "pencilRocket" },
+        { name: "They are 体育帽子ブーメラン", type: "rulerSlash" }
+      ],
+      level2: [
+        { name: "Are you トルネードそうじ", type: "broom" },
+        { name: "Is he サンダーボルト消しゴム", type: "eraser" },
+        { name: "Is she ムーンライトビーム", type: "print" },
+        { name: "Are they 洗濯ぐるぐる", type: "washer" },
+        { name: "Am I ミラクルパンチ", type: "bagPush" },
+        { name: "Are you 前出しキック", type: "car" },
+        { name: "Are they ひっくり返しアタック", type: "washer" },
+        { name: "Is this ブーメラン", type: "broom" },
+        { name: "Are you トルネード", type: "broom" },
+        { name: "Is he 黒板消しダイブ", type: "eraserRoller" },
+        { name: "Is she チョークスプラッシュ", type: "chalkMissile" },
+        { name: "Are they うわばきハリケーン", type: "shoeDash" },
+        { name: "Am I えんぴつドリル", type: "pencilRocket" },
+        { name: "Is this ぞうきんスラッシュ", type: "broom" },
+        { name: "Is that ちりとりキャノン", type: "dustpanPusun" },
+        { name: "Are these 定規カッター", type: "rulerSlash" },
+        { name: "Are those 分度器ブーメラン", type: "rulerSlash" },
+        { name: "Are you ほうきスイープ", type: "broom" },
+        { name: "Are you ランドセルアタック", type: "bagPush" },
+        { name: "Are you 給食トレー返し", type: "trayCannon" },
+        { name: "Is this お道具箱オープン", type: "print" },
+        { name: "Are those プリント雪崩", type: "print" },
+        { name: "Am I 名札フラッシュ", type: "notebookFlash" }
+      ],
+      level3: [
+        { name: "Yes, I am おそうじハリケーン", type: "broom" },
+        { name: "No, I’m not 脱水スピン", type: "washer" },
+        { name: "Yes, he is レーザー消しゴム", type: "eraser" },
+        { name: "No, she isn’t バリアプリント", type: "print" },
+        { name: "Yes, they are キャノン", type: "car" },
+        { name: "No, they aren’t ミサイルランドセル", type: "bagPush" },
+        { name: "Yes, it is スパーク", type: "print" },
+        { name: "No, it isn’t しょぼくれバスター", type: "eraser" },
+        { name: "Yes, I am えんぴつビーム", type: "pencilRocket" },
+        { name: "No, I’m not おならバリア", type: "fartBarrier" },
+        { name: "Yes, he is 消しゴムパンチ", type: "eraserRoller" },
+        { name: "No, he isn’t ぞうきんガード", type: "broom" },
+        { name: "Yes, she is リコーダーソニック", type: "recorderSonic" },
+        { name: "No, she isn’t 下じきシールド", type: "rulerSlash" },
+        { name: "Yes, they are 給食トレーキャノン", type: "trayCannon" },
+        { name: "No, they aren’t うわばきキック", type: "shoeDash" },
+        { name: "Yes, it is チョークフラッシュ", type: "chalkMissile" },
+        { name: "No, it isn’t ちりとりプスン", type: "dustpanPusun" },
+        { name: "I am 返事カウンター", type: "notebookFlash" },
+        { name: "they are みんなでランドセルプッシュ", type: "bagPush" },
+        { name: "it is ピンポイント消しゴム", type: "eraserRoller" },
+        { name: "No, I’m not うんち回避", type: "poopAvoid" },
+        { name: "Yes, they are プリント紙ふぶき", type: "print" }
+      ],
+      level4: [
+        { name: "Yes, I am ボイスキャノン", type: "car" },
+        { name: "Are you 発音ウェーブ", type: "washer" },
+        { name: "Is he 声出しスレイヤー", type: "broom" },
+        { name: "Yes, I am シャウト", type: "print" },
+        { name: "Are you トルネードボイス", type: "broom" },
+        { name: "they are 音読ビーム", type: "eraser" },
+        { name: "Are they リコーダーキャノン", type: "recorderSonic" },
+        { name: "Yes, I am ボイスビーム", type: "notebookFlash" },
+        { name: "Are you トルネードボイス", type: "broom" },
+        { name: "Is he 声出しチョーク", type: "chalkMissile" },
+        { name: "Is she 音読下じきウェーブ", type: "rulerSlash" },
+        { name: "Are they みんなでシャウト", type: "recorderSonic" },
+        { name: "they are 音読ランドセル", type: "bagPush" },
+        { name: "No, I’m not しずかにおならガード", type: "fartBarrier" },
+        { name: "Yes, it is はっきり発音ビーム", type: "notebookFlash" },
+        { name: "No, it isn’t プスン音読", type: "dustpanPusun" },
+        { name: "They are なわとびジャンプ", type: "jumpRopeSpin" },
+        { name: "This is 給食トレーアタック", type: "trayCannon" },
+        { name: "Are you リコーダービーム", type: "recorderSonic" },
+        { name: "Is this ぞうきんスピン", type: "broom" },
+        { name: "Yes, it is 黒板消し", type: "eraserRoller" }
+      ],
+      level5: [
+        { name: "This is 消しゴムスラッシュ", type: "eraser" },
+        { name: "These are けしけしビーム", type: "eraser" },
+        { name: "an apple りんごバズーカ", type: "car" },
+        { name: "a pen えんぴつスピン", type: "washer" },
+        { name: "my pen 所有パンチ", type: "bagPush" },
+        { name: "your book 本だなクラッシュ", type: "print" },
+        { name: "These are 複数形ハリケーン", type: "broom" },
+        { name: "a をつけるな掃除機", type: "broom" },
+        { name: "an egg たまご大爆発", type: "print" },
+        { name: "These are 最強アタック", type: "bagPush" },
+        { name: "a pen えんぴつロケット", type: "pencilRocket" },
+        { name: "an apple りんごバズーカ", type: "trayCannon" },
+        { name: "a book 本だなクラッシュ", type: "print" },
+        { name: "an egg たまごスプラッシュ", type: "waterBottleSplash" },
+        { name: "This is 消しゴムスラッシュ", type: "eraserRoller" },
+        { name: "Those are ぞうきんスイープ", type: "broom" },
+        { name: "These are プリント雪崩", type: "print" },
+        { name: "Those are うわばき大行進", type: "shoeDash" },
+        { name: "my pen 所有パンチ", type: "bagPush" },
+        { name: "your book 連絡帳アタック", type: "notebookFlash" },
+        { name: "a をつけるな下じきプレス", type: "rulerSlash" },
+        { name: "an を忘れるなチョークビーム", type: "chalkMissile" },
+        { name: "pens えんぴつ大量発射", type: "pencilRocket" },
+        { name: "books 本だなドミノ", type: "print" },
+        { name: "my / your お道具箱ガード", type: "print" },
+        { name: "Those are 最強ちりとり", type: "dustpanPusun" },
+        { name: "a pen セロテープぐるぐる", type: "tapeWrap" },
+        { name: "an orange オレンジころころ", type: "eraserRoller" },
+        { name: "These are うわばきダッシュ", type: "shoeDash" },
+        { name: "my pens ランドセル満タン", type: "bagPush" }
+      ],
+      level6: [
+        { name: "I am パワー全開アタック", type: "car" },
+        { name: "They are 撃退ビーム", type: "broom" },
+        { name: "You are マスターノヴァ", type: "washer" },
+        { name: "I am 全問正解アルティメット", type: "print" },
+        { name: "They are ごちゃまぜ爆弾", type: "washer" },
+        { name: "I am わかった気がするビーム", type: "eraser" },
+        { name: "It is 見分けアタック", type: "bagPush" },
+        { name: "These are りんごミサイル", type: "car" },
+        { name: "Are you トルネード", type: "broom" },
+        { name: "This is ぞうきんスラッシュ", type: "broom" },
+        { name: "They are うわばきダッシュ", type: "shoeDash" },
+        { name: "Yes, I am えんぴつビーム", type: "pencilRocket" },
+        { name: "No, I’m not おならバリア", type: "fartBarrier" },
+        { name: "Are these 給食トレーキャノン", type: "trayCannon" },
+        { name: "Those are プリント雪崩", type: "print" },
+        { name: "This is 消しゴムスラッシュ", type: "eraserRoller" },
+        { name: "an apple りんごバズーカ", type: "trayCannon" },
+        { name: "my pen 所有パンチ", type: "bagPush" },
+        { name: "No, it isn’t ちりとりプスン", type: "dustpanPusun" },
+        { name: "Yes, they are ランドセルプッシュ", type: "bagPush" },
+        { name: "You are 黒板消しクラッシュ", type: "eraserRoller" },
+        { name: "Are you ほうきスイープ", type: "broom" },
+        { name: "Those are ぞうきんスイープ", type: "broom" },
+        { name: "they are みんなでドーン", type: "trayCannon" },
+        { name: "This is 下じきバリア", type: "rulerSlash" },
+        { name: "Are those 分度器ブーメラン", type: "rulerSlash" },
+        { name: "I am 体育帽子フラッシュ", type: "notebookFlash" },
+        { name: "No, they aren’t うんち回避", type: "poopAvoid" }
+      ]
+    };
+
+    const bossConfigs = {
+      1: {
+        name: "am/is/are スライム",
+        className: "level-1",
+        label: "レベル1",
+        subtitle: "be動詞スライムを倒そう。am / are / is を選ぶステージ！",
+        specials: specialMoves.level1
+      },
+      2: {
+        name: "ぎもん文コウモリ",
+        className: "level-2",
+        label: "レベル2",
+        subtitle: "be動詞を文の前に出して、ぎもん文コウモリを倒そう！",
+        specials: specialMoves.level2
+      },
+      3: {
+        name: "Yes/No ゴーレム",
+        className: "level-3",
+        label: "レベル3",
+        subtitle: "Yes / No の返事で、石の敵をやっつけよう！",
+        specials: specialMoves.level3
+      },
+      4: {
+        name: "音読ドラゴン",
+        className: "level-4",
+        label: "レベル4",
+        subtitle: "声に出して答えるステージ。親ができたら採点！",
+        specials: specialMoves.level4
+      },
+      5: {
+        name: "a/an 複数形モンスター",
+        className: "level-5",
+        label: "レベル5",
+        subtitle: "1つ・2つ以上・a / an / my / your を見分けよう！",
+        specials: specialMoves.level5
+      },
+      6: {
+        name: "ごちゃまぜ大王",
+        className: "level-6",
+        label: "レベル6",
+        subtitle: "最後は全部まぜまぜ。ラスボスを倒そう！",
+        specials: specialMoves.level6
+      }
+    };
+
+    const bossBattleState = {
+      round: [],
+      index: 0,
+      score: 0,
+      answered: false,
+      finished: false,
+      selectedLevel: 1,
+      specialName: "",
+      specialType: "broom",
+      customBossFace: false,
+      autoTimer: null
+    };
+
+    const ULTIMATE_CHARGE_TIME = 1200;
+    const ULTIMATE_ATTACK_TIME = 1800;
+    const ULTIMATE_DEFEAT_TIME = 1600;
+
+    const AUTO_NEXT_DELAY_CORRECT = 2800;
+    const AUTO_NEXT_DELAY_WRONG = 3500;
+    const AUTO_NEXT_DELAY_CORRECT_SHORT = 2300;
+    const AUTO_NEXT_DELAY_WRONG_SHORT = 3000;
+    const AUTO_NEXT_EXTRA_SLOW = 3000;
+
+    const cropState = {
+      target: "hero",
+      image: null,
+      panX: 0,
+      panY: 0,
+      scale: 1,
+      dragging: false,
+      lastX: 0,
+      lastY: 0
+    };
+
+    const els = {
+      levelBadge: document.getElementById("levelBadge"),
+      bossModeButton: document.getElementById("bossModeButton"),
+      statusCard: document.getElementById("statusCard"),
+      questionCounter: document.getElementById("questionCounter"),
+      scoreCounter: document.getElementById("scoreCounter"),
+      modeHint: document.getElementById("modeHint"),
+      progressFill: document.getElementById("progressFill"),
+      quizCard: document.getElementById("quizCard"),
+      resultCard: document.getElementById("resultCard"),
+      questionText: document.getElementById("questionText"),
+      japaneseMeaning: document.getElementById("japaneseMeaning"),
+      sentence: document.getElementById("sentence"),
+      choices: document.getElementById("choices"),
+      modelAnswer: document.getElementById("modelAnswer"),
+      feedback: document.getElementById("feedback"),
+      explanation: document.getElementById("explanation"),
+      actions: document.getElementById("actions"),
+      resultTitle: document.getElementById("resultTitle"),
+      resultScore: document.getElementById("resultScore"),
+      resultMessage: document.getElementById("resultMessage"),
+      retryLevelButton: document.getElementById("retryLevelButton"),
+      nextLevelButton: document.getElementById("nextLevelButton"),
+      summaryCard: document.getElementById("summaryCard"),
+      bossBattleCard: document.getElementById("bossBattleCard"),
+      battleTitle: document.getElementById("battleTitle"),
+      battleSubtitle: document.getElementById("battleSubtitle"),
+      faceUpload: document.getElementById("faceUpload"),
+      bossFaceUpload: document.getElementById("bossFaceUpload"),
+      autoNextToggle: document.getElementById("autoNextToggle"),
+      slowNextToggle: document.getElementById("slowNextToggle"),
+      shortFxToggle: document.getElementById("shortFxToggle"),
+      soundToggle: document.getElementById("soundToggle"),
+      heroArt: document.getElementById("heroArt"),
+      heroFace: document.getElementById("heroFace"),
+      heroCharacter: document.getElementById("heroCharacter"),
+      bossMonster: document.getElementById("bossMonster"),
+      bossName: document.getElementById("bossName"),
+      bossFace: document.getElementById("bossFace"),
+      answerBurst: document.getElementById("answerBurst"),
+      particleLayer: document.getElementById("particleLayer"),
+      bossBeam: document.getElementById("bossBeam"),
+      ultimateBeamImage: document.getElementById("ultimateBeamImage"),
+      bossSmoke: document.getElementById("bossSmoke"),
+      puffText: document.getElementById("puffText"),
+      bossQuestionCounter: document.getElementById("bossQuestionCounter"),
+      bossScoreCounter: document.getElementById("bossScoreCounter"),
+      specialGaugeText: document.getElementById("specialGaugeText"),
+      specialGaugeFill: document.getElementById("specialGaugeFill"),
+      chargeText: document.getElementById("chargeText"),
+      bossQuestionBox: document.getElementById("bossQuestionBox"),
+      bossQuestionText: document.getElementById("bossQuestionText"),
+      bossJapanese: document.getElementById("bossJapanese"),
+      bossSentence: document.getElementById("bossSentence"),
+      bossChoices: document.getElementById("bossChoices"),
+      bossFinalCall: document.getElementById("bossFinalCall"),
+      bossMessage: document.getElementById("bossMessage"),
+      bossRetryButton: document.getElementById("bossRetryButton"),
+      bossNextLevelButton: document.getElementById("bossNextLevelButton"),
+      cropPanel: document.getElementById("cropPanel"),
+      cropTitle: document.getElementById("cropTitle"),
+      cropCanvas: document.getElementById("cropCanvas"),
+      cropScale: document.getElementById("cropScale"),
+      cropApplyButton: document.getElementById("cropApplyButton"),
+      cropResetButton: document.getElementById("cropResetButton"),
+      cropCancelButton: document.getElementById("cropCancelButton")
+    };
+
+    function shuffle(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function makeRound(level) {
+      const levelQuestions = questions.filter((question) => question.level === level);
+      const weakSet = new Set(state.weakIds);
+      const weighted = [];
+      levelQuestions.forEach((question) => {
+        weighted.push(question);
+        if (weakSet.has(question.id)) {
+          weighted.push(question);
+          weighted.push(question);
+        }
+      });
+
+      const selected = [];
+      const used = new Set();
+      shuffle(weighted).forEach((question) => {
+        if (selected.length < 5 && !used.has(question.id)) {
+          selected.push(question);
+          used.add(question.id);
+        }
+      });
+
+      shuffle(levelQuestions).forEach((question) => {
+        if (selected.length < 5 && !used.has(question.id)) {
+          selected.push(question);
+          used.add(question.id);
+        }
+      });
+
+      return selected.slice(0, 5);
+    }
+
+    function showNormalMode() {
+      window.clearTimeout(bossBattleState.autoTimer);
+      els.statusCard.classList.remove("hidden");
+      els.quizCard.classList.remove("hidden");
+      els.summaryCard.classList.remove("hidden");
+      els.bossBattleCard.classList.add("hidden");
+      els.bossModeButton.classList.remove("active");
+      els.cropPanel.classList.remove("show");
+    }
+
+    function startLevel(level, message) {
+      showNormalMode();
+      state.currentLevel = level;
+      state.round = makeRound(level);
+      state.index = 0;
+      state.score = 0;
+      state.answered = false;
+      document.querySelectorAll(".level-button").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.level) === level);
+      });
+      els.levelBadge.textContent = levelNames[level];
+      els.resultCard.classList.remove("show");
+      els.quizCard.classList.remove("hidden");
+      renderQuestion(message);
+    }
+
+    function currentQuestion() {
+      return state.round[state.index];
+    }
+
+    function renderQuestion(message) {
+      const question = currentQuestion();
+      state.answered = false;
+      els.questionText.textContent = question.questionText;
+      els.japaneseMeaning.textContent = question.japaneseMeaning;
+      els.sentence.innerHTML = question.sentenceHtml;
+      els.choices.innerHTML = "";
+      els.actions.innerHTML = "";
+      els.modelAnswer.innerHTML = "";
+      els.modelAnswer.classList.remove("show");
+      els.feedback.textContent = "";
+      els.feedback.className = "feedback";
+      els.explanation.textContent = "";
+      els.explanation.className = "explanation";
+      updateStatus();
+
+      if (message) {
+        els.feedback.textContent = message;
+        els.feedback.className = "feedback ok show";
+      }
+
+      if (question.type === "choice") {
+        els.modeHint.textContent = "選んで答えよう";
+        renderChoices(question);
+      } else {
+        els.modeHint.textContent = "声に出して答えよう";
+        renderSpeaking(question);
+      }
+    }
+
+    function renderChoices(question) {
+      els.choices.classList.remove("hidden");
+      shuffle(question.choices).forEach((choice) => {
+        const button = document.createElement("button");
+        button.className = "choice-button";
+        button.type = "button";
+        button.textContent = choice;
+        button.addEventListener("click", () => answerChoice(choice, button));
+        els.choices.appendChild(button);
+      });
+    }
+
+    function renderSpeaking(question) {
+      els.choices.classList.add("hidden");
+
+      const showAnswer = document.createElement("button");
+      showAnswer.className = "action-button light";
+      showAnswer.type = "button";
+      showAnswer.textContent = "答えを見る";
+      showAnswer.addEventListener("click", () => {
+        els.modelAnswer.innerHTML = question.modelAnswers.join("<br>");
+        els.modelAnswer.classList.add("show");
+        els.explanation.textContent = question.explanation;
+        els.explanation.classList.add("show");
+      });
+
+      const done = document.createElement("button");
+      done.className = "action-button success";
+      done.type = "button";
+      done.textContent = "できた";
+      done.addEventListener("click", () => answerSpeaking(true));
+
+      const retry = document.createElement("button");
+      retry.className = "action-button retry";
+      retry.type = "button";
+      retry.textContent = "もう一回";
+      retry.addEventListener("click", () => answerSpeaking(false));
+
+      els.actions.append(showAnswer, done, retry);
+    }
+
+    function answerChoice(choice, clickedButton) {
+      if (state.answered) return;
+      const question = currentQuestion();
+      const ok = choice === question.answer;
+      state.answered = true;
+      if (ok) state.score += 1;
+      rememberWeak(question.id, !ok);
+
+      document.querySelectorAll(".choice-button").forEach((button) => {
+        button.disabled = true;
+        if (button.textContent === question.answer) button.classList.add("correct");
+      });
+      if (!ok) clickedButton.classList.add("wrong");
+
+      els.feedback.textContent = ok ? "正解！よくできたね" : `不正解。正しい答えは「${question.answer}」です。`;
+      els.feedback.className = `feedback ${ok ? "ok" : "no"} show`;
+      els.explanation.textContent = question.explanation;
+      els.explanation.classList.add("show");
+      addNextButton();
+      updateStatus();
+    }
+
+    function answerSpeaking(ok) {
+      if (state.answered) return;
+      const question = currentQuestion();
+      state.answered = true;
+      if (ok) state.score += 1;
+      rememberWeak(question.id, !ok);
+
+      els.modelAnswer.innerHTML = question.modelAnswers.join("<br>");
+      els.modelAnswer.classList.add("show");
+      els.feedback.textContent = ok ? "できた！声に出せたね" : "もう一回れんしゅうしよう";
+      els.feedback.className = `feedback ${ok ? "ok" : "no"} show`;
+      els.explanation.textContent = question.explanation;
+      els.explanation.classList.add("show");
+      els.actions.querySelectorAll("button").forEach((button) => {
+        if (button.textContent !== "答えを見る") button.disabled = true;
+      });
+      addNextButton();
+      updateStatus();
+    }
+
+    function addNextButton() {
+      const next = document.createElement("button");
+      next.className = "action-button";
+      next.type = "button";
+      next.textContent = state.index === state.round.length - 1 ? "点数を見る" : "次の問題へ";
+      next.addEventListener("click", nextQuestion);
+      els.actions.appendChild(next);
+    }
+
+    function nextQuestion() {
+      if (state.index < state.round.length - 1) {
+        state.index += 1;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      const passed = state.score >= 4;
+      const isLast = state.currentLevel === 6;
+      els.quizCard.classList.add("hidden");
+      els.resultCard.classList.add("show");
+      els.resultTitle.textContent = passed
+        ? (isLast ? "すばらしい！ぜんぶのレベルを練習したよ" : "レベルアップ！")
+        : "もう一度チャレンジ";
+      els.resultScore.textContent = `5問中 ${state.score}問 正解`;
+      els.resultMessage.textContent = passed
+        ? (isLast ? "声に出して言える力がついてきました。" : "レベルアップ！次は少しむずかしくなるよ")
+        : "同じレベルをもう一度やると、もっとできるようになります。";
+      els.nextLevelButton.classList.toggle("hidden", isLast);
+      els.nextLevelButton.textContent = passed ? "次のレベルへ" : "同じレベルをもう一度";
+      updateStatus(true);
+    }
+
+    function updateStatus(done = false) {
+      const number = done ? state.round.length : state.index + 1;
+      els.questionCounter.textContent = `${number} / ${state.round.length || 5} 問`;
+      els.scoreCounter.textContent = `正解 ${state.score}`;
+      const answeredCount = done ? state.round.length : state.index + (state.answered ? 1 : 0);
+      const progress = done ? 100 : Math.round((answeredCount / (state.round.length || 5)) * 100);
+      els.progressFill.style.width = `${progress}%`;
+    }
+
+    function rememberWeak(id, isWeak) {
+      const weakSet = new Set(state.weakIds);
+      if (isWeak) {
+        weakSet.add(id);
+      } else {
+        weakSet.delete(id);
+      }
+      state.weakIds = [...weakSet];
+      localStorage.setItem("englishGrammarWeakIds", JSON.stringify(state.weakIds));
+    }
+
+    function makeStageRound(level) {
+      const level5Ids = [
+        "l5-aan-this-pen", "l5-aan-this-apple", "l5-aan-that-egg", "l5-aan-that-book",
+        "l5-none-these-pens", "l5-none-those-apples", "l5-none-this-my-pen", "l5-none-this-your-book",
+        "l5-none-these-my-pens", "l5-none-those-your-books", "l5-noun-these-pens", "l5-noun-this-a-pen",
+        "l5-noun-those-apples", "l5-noun-that-an-apple", "l5-poss-this-my-pen", "l5-poss-these-my-pens",
+        "l5-poss-that-your-book", "l5-poss-those-your-books"
+      ];
+      const levelPools = {
+        1: ["l1-i-am-happy", "l1-you-are-happy", "l1-he-is-happy", "l1-she-is-happy", "l1-they-are-happy", "l1-this-is-pencil", "l1-that-is-desk", "l1-these-are-apples", "l1-those-are-books"],
+        2: ["l2-am-i-happy", "l2-are-you-happy", "l2-is-he-happy", "l2-is-she-happy", "l2-are-they-happy", "l2-is-this-pencil", "l2-is-that-desk", "l2-are-these-apples", "l2-are-those-books"],
+        3: ["l3-yes-i-am", "l3-no-i-am-not", "l3-yes-you-are", "l3-no-you-arent", "l3-yes-you-friend-i-am", "l3-no-you-friend-im-not", "l3-yes-he-is", "l3-no-he-isnt", "l3-yes-she-is", "l3-no-she-isnt", "l3-yes-they-are-happy", "l3-no-they-arent-happy", "l3-yes-it-is", "l3-no-it-isnt", "l3-yes-they-are", "l3-no-these-they"],
+        4: ["l4-am-i-happy", "l4-are-you-happy", "l4-is-he-happy", "l4-is-she-happy", "l4-are-they-happy", "l4-this-pencil", "l4-these-apples"],
+        5: level5Ids,
+        6: ["l1-they-are-students", "l2-are-they-students", "l3-yes-you-are", "l3-no-you-arent", "l3-no-they-arent-happy", "l3-yes-they-are", "l4-are-you-happy", "l4-are-they-happy", "l5-ask-you", "l5-ask-these", "l5-ask-they", "l1-this-is-pencil", "l2-is-she-sister", "l3-yes-it-is", ...level5Ids]
+      };
+      const pool = (levelPools[level] || levelPools[1])
+        .map((id) => questions.find((question) => question.id === id))
+        .filter(Boolean);
+      return shuffle(pool).slice(0, 5);
+    }
+
+    function startBossBattle(level = state.currentLevel || 1) {
+      window.clearTimeout(bossBattleState.autoTimer);
+      state.currentLevel = level;
+      bossBattleState.round = makeStageRound(level);
+      bossBattleState.index = 0;
+      bossBattleState.score = 0;
+      bossBattleState.answered = false;
+      bossBattleState.finished = false;
+      bossBattleState.selectedLevel = level;
+      const special = pickBossSpecial();
+      bossBattleState.specialName = special.name;
+      bossBattleState.specialType = special.type;
+
+      els.statusCard.classList.add("hidden");
+      els.quizCard.classList.add("hidden");
+      els.resultCard.classList.remove("show");
+      els.summaryCard.classList.add("hidden");
+      els.bossBattleCard.classList.remove("hidden");
+      els.bossModeButton.classList.remove("active");
+      document.querySelectorAll(".level-button").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.level) === level);
+      });
+      const config = bossConfigs[level] || bossConfigs[1];
+      els.levelBadge.textContent = `${config.label}：ステージバトル`;
+      els.battleTitle.textContent = `${config.label}：${config.name}`;
+      els.battleSubtitle.textContent = config.subtitle;
+      els.bossQuestionBox.classList.remove("hidden");
+      els.bossRetryButton.classList.add("hidden");
+      els.bossNextLevelButton.classList.add("hidden");
+      els.bossFinalCall.textContent = "";
+      els.chargeText.textContent = "";
+      els.chargeText.classList.remove("show");
+      clearBattleParticles();
+      setBossExplanationMessage("neutral", "5問連続でこたえよう。全問正解で必殺技が出るよ！");
+      els.heroCharacter.className = "hero-character";
+      setHeroPose("idle");
+      setHeroAuraLevel(0);
+      setupBossForLevel();
+      resetBattleEffect(els.heroCharacter, "hero-blown-away");
+      resetBattleEffect(els.heroCharacter, "hero-dizzy");
+      resetBattleEffect(els.heroCharacter, "ultimate-charging");
+      resetBattleEffect(els.bossBeam, "fire");
+      resetBattleEffect(els.ultimateBeamImage, "fire");
+      resetBattleEffect(els.bossSmoke, "puff");
+      resetBattleEffect(els.puffText, "show");
+      els.specialGaugeFill.classList.remove("max", "fizzle", "charge");
+      scrollBossIntoView();
+      renderBossQuestion();
+    }
+
+    function setHeroAuraLevel(level) {
+      for (let i = 0; i <= 5; i++) {
+        els.heroCharacter.classList.remove(`hero-aura-level-${i}`);
+      }
+      const safeLevel = Math.max(0, Math.min(5, level));
+      if (safeLevel > 0) {
+        els.heroCharacter.classList.add(`hero-aura-level-${safeLevel}`);
+      }
+    }
+
+    function setHeroPose(pose = "idle") {
+      const poseMap = {
+        idle: "assets/hero/poses/hero-idle.png",
+        ready: "assets/hero/poses/hero-ready.png",
+        charge: "assets/hero/poses/hero-ready.png",
+        victory: "assets/hero/poses/hero-victory.png",
+        sad: "assets/hero/poses/hero-sad.png",
+        blown: "assets/hero/poses/hero-blown.png"
+      };
+      const safePose = poseMap[pose] ? pose : "idle";
+      ["idle", "ready", "charge", "victory", "sad", "blown"].forEach((name) => {
+        els.heroCharacter.classList.remove(`hero-pose-${name}`);
+      });
+      els.heroCharacter.classList.add(`hero-pose-${safePose}`);
+      els.heroArt.src = poseMap[safePose];
+    }
+
+    function pickBossSpecial() {
+      const config = bossConfigs[bossBattleState.selectedLevel || state.currentLevel || 1] || bossConfigs[1];
+      return shuffle(config.specials)[0];
+    }
+
+    function refreshBossSpecial() {
+      const special = pickBossSpecial();
+      bossBattleState.specialName = special.name;
+      bossBattleState.specialType = special.type;
+    }
+
+    function setupBossForLevel() {
+      const config = bossConfigs[bossBattleState.selectedLevel] || bossConfigs[1];
+      els.bossName.textContent = config.name;
+      els.bossMonster.className = `boss-monster ${config.className}${bossBattleState.customBossFace ? " custom" : ""}`;
+    }
+
+    function currentBossQuestion() {
+      return bossBattleState.round[bossBattleState.index];
+    }
+
+    function renderBossQuestion() {
+      setHeroPose("idle");
+      const question = currentBossQuestion();
+      bossBattleState.answered = false;
+      els.bossQuestionCounter.textContent = `${bossBattleState.index + 1} / ${bossBattleState.round.length} 問`;
+      els.bossScoreCounter.textContent = `正解 ${bossBattleState.score}`;
+      updateSpecialGauge();
+      els.bossQuestionText.textContent = question.questionText;
+      els.bossJapanese.textContent = question.japaneseMeaning;
+      els.bossSentence.innerHTML = question.sentenceHtml;
+      els.bossChoices.innerHTML = "";
+      els.bossFinalCall.textContent = "";
+      els.bossQuestionBox.classList.remove("correct-flash", "wrong-flash");
+      els.answerBurst.classList.remove("show", "correct", "wrong");
+      clearBattleParticles();
+      setBossExplanationMessage("neutral", question.type === "speaking" ? "声に出して答えよう。できたら採点してね！" : "敵の問題にこたえよう！");
+      if (question.type === "speaking") {
+        renderStageSpeaking(question);
+        return;
+      }
+      shuffle(question.choices).forEach((choice) => {
+        const button = document.createElement("button");
+        button.className = "choice-button";
+        button.type = "button";
+        button.textContent = choice;
+        button.addEventListener("click", () => answerBossChoice(choice, button));
+        els.bossChoices.appendChild(button);
+      });
+    }
+
+    function renderStageSpeaking(question) {
+      const model = document.createElement("button");
+      model.className = "choice-button";
+      model.type = "button";
+      model.textContent = "答えを見る";
+      model.addEventListener("click", () => {
+        setBossExplanationMessage("neutral", `お手本：${question.modelAnswers.join(" / ")}。${question.explanation}`);
+      });
+
+      const done = document.createElement("button");
+      done.className = "choice-button correct";
+      done.type = "button";
+      done.textContent = "できた";
+      done.addEventListener("click", () => answerStageSpeaking(true));
+
+      const retry = document.createElement("button");
+      retry.className = "choice-button wrong";
+      retry.type = "button";
+      retry.textContent = "もう一回";
+      retry.addEventListener("click", () => answerStageSpeaking(false));
+
+      els.bossChoices.append(model, done, retry);
+    }
+
+    function answerStageSpeaking(ok) {
+      if (bossBattleState.answered || bossBattleState.finished) return;
+      bossBattleState.answered = true;
+      if (ok) bossBattleState.score += 1;
+      els.bossChoices.querySelectorAll("button").forEach((button) => {
+        button.disabled = true;
+      });
+      if (ok) {
+        setHeroAuraLevel(bossBattleState.score);
+        const question = currentBossQuestion();
+        playChargeAnimation(question.modelAnswers[0]);
+        spawnCorrectBurst(question.modelAnswers[0]);
+        flashAnswerState(true);
+        showBossAnswerExplanation(question, true);
+      } else {
+        const question = currentBossQuestion();
+        playMissAnimation();
+        spawnWrongBurst(question.modelAnswers[0]);
+        flashAnswerState(false);
+        showBossAnswerExplanation(question, false);
+      }
+      els.bossScoreCounter.textContent = `正解 ${bossBattleState.score}`;
+      updateSpecialGauge();
+      addBossNextButton();
+      if (els.autoNextToggle.checked) {
+        const delay = getAutoNextDelay(ok);
+        bossBattleState.autoTimer = window.setTimeout(nextBossQuestion, delay);
+      }
+    }
+
+    function answerBossChoice(choice, clickedButton) {
+      if (bossBattleState.answered || bossBattleState.finished) return;
+      const question = currentBossQuestion();
+      const ok = choice === question.answer;
+      bossBattleState.answered = true;
+      if (ok) bossBattleState.score += 1;
+
+      els.bossChoices.querySelectorAll("button").forEach((button) => {
+        button.disabled = true;
+        if (button.textContent === question.answer) {
+          button.classList.add("correct");
+        } else if (button === clickedButton) {
+          button.classList.add("wrong");
+        } else {
+          button.classList.add("dimmed");
+        }
+      });
+
+      if (ok) {
+        setHeroAuraLevel(bossBattleState.score);
+        playChargeAnimation(question.answer);
+        spawnCorrectBurst(question.answer);
+        flashAnswerState(true);
+        showBossAnswerExplanation(question, true);
+      } else {
+        playMissAnimation();
+        spawnWrongBurst(question.answer);
+        flashAnswerState(false);
+        showBossAnswerExplanation(question, false);
+      }
+      els.bossScoreCounter.textContent = `正解 ${bossBattleState.score}`;
+      updateSpecialGauge();
+      addBossNextButton();
+      if (els.autoNextToggle.checked) {
+        const delay = getAutoNextDelay(ok);
+        bossBattleState.autoTimer = window.setTimeout(nextBossQuestion, delay);
+      }
+    }
+
+    function getAutoNextDelay(ok) {
+      const baseDelay = ok
+        ? (els.shortFxToggle.checked ? AUTO_NEXT_DELAY_CORRECT_SHORT : AUTO_NEXT_DELAY_CORRECT)
+        : (els.shortFxToggle.checked ? AUTO_NEXT_DELAY_WRONG_SHORT : AUTO_NEXT_DELAY_WRONG);
+      return baseDelay + (els.slowNextToggle.checked ? AUTO_NEXT_EXTRA_SLOW : 0);
+    }
+
+    function addBossNextButton() {
+      const next = document.createElement("button");
+      next.className = "action-button";
+      next.type = "button";
+      next.textContent = bossBattleState.index === bossBattleState.round.length - 1 ? "結果を見る" : "次の問題へ";
+      next.addEventListener("click", nextBossQuestion);
+      els.bossChoices.appendChild(next);
+    }
+
+    function nextBossQuestion() {
+      window.clearTimeout(bossBattleState.autoTimer);
+      if (bossBattleState.index < bossBattleState.round.length - 1) {
+        bossBattleState.index += 1;
+        scrollBossIntoView();
+        renderBossQuestion();
+      } else {
+        finishBossBattle();
+      }
+    }
+
+    function updateSpecialGauge() {
+      const percent = bossBattleState.score * 20;
+      els.specialGaugeText.textContent = `必殺技ゲージ ${percent}%`;
+      els.specialGaugeFill.style.width = `${percent}%`;
+      els.specialGaugeFill.classList.toggle("max", percent === 100);
+    }
+
+    function setBossExplanationMessage(kind, text) {
+      els.bossMessage.classList.remove("correct", "wrong");
+      if (kind === "correct" || kind === "wrong") {
+        els.bossMessage.classList.add(kind);
+      }
+      els.bossMessage.textContent = text;
+    }
+
+    function showBossAnswerExplanation(question, ok) {
+      const explanation = question.explanation || "答えの形をもう一度見てみよう。";
+      if (ok) {
+        setBossExplanationMessage("correct", `✅ 正解！ ${explanation}`);
+        return;
+      }
+      const answerText = question.type === "speaking"
+        ? `お手本は ${question.modelAnswers.join(" / ")}`
+        : `正解は ${question.answer}`;
+      setBossExplanationMessage("wrong", `💡 ${answerText}。${explanation}`);
+    }
+
+    function finishBossBattle() {
+      window.clearTimeout(bossBattleState.autoTimer);
+      bossBattleState.finished = true;
+      els.bossQuestionCounter.textContent = `${bossBattleState.round.length} / ${bossBattleState.round.length} 問`;
+      els.bossQuestionBox.classList.add("hidden");
+      els.bossRetryButton.classList.remove("hidden");
+      const hasNextLevel = bossBattleState.selectedLevel < 6;
+      els.bossNextLevelButton.classList.toggle("hidden", !(bossBattleState.score === 5 && hasNextLevel));
+      if (bossBattleState.score === 5) {
+        playUltimateSuccess();
+      } else {
+        playPusunFail();
+      }
+    }
+
+    function playChargeAnimation(answerText) {
+      playBattleEffect(els.heroCharacter, "powerup");
+      playBattleEffect(els.specialGaugeFill, "charge");
+      showChargeText();
+      playSound("ok");
+    }
+
+    function playMissAnimation() {
+      playBattleEffect(els.heroCharacter, "sad");
+      playSound("miss");
+    }
+
+    function flashAnswerState(ok) {
+      const className = ok ? "correct-flash" : "wrong-flash";
+      const flashName = ok ? "battleCorrectFlash" : "battleWrongFlash";
+      els.bossQuestionBox.classList.remove("correct-flash", "wrong-flash");
+      void els.bossQuestionBox.offsetWidth;
+      els.bossQuestionBox.classList.add(className);
+      els.bossBattleCard.style.animation = `${flashName} 0.55s ease`;
+      window.setTimeout(() => {
+        els.bossBattleCard.style.animation = "";
+      }, 620);
+    }
+
+    function playUltimateSuccess() {
+      const short = els.shortFxToggle.checked;
+      const chargeTime = short ? 850 : ULTIMATE_CHARGE_TIME;
+      const attackTime = short ? 1150 : ULTIMATE_ATTACK_TIME;
+      const defeatTime = short ? 1050 : ULTIMATE_DEFEAT_TIME;
+      refreshBossSpecial();
+      setHeroPose("idle");
+      setHeroAuraLevel(5);
+      playBattleEffect(els.heroCharacter, "ultimate-charging");
+      els.bossFinalCall.textContent = "必殺技チャージ中……";
+      setBossExplanationMessage("neutral", "光がゆっくり集まっているよ……");
+      playBattleEffect(els.bossBattleCard, "flash");
+      playSound("special");
+      setTimeout(() => {
+        resetBattleEffect(els.heroCharacter, "ultimate-charging");
+        setHeroAuraLevel(0);
+        setHeroPose("victory");
+        els.bossFinalCall.textContent = `必殺技発動！ ${bossBattleState.specialName}！`;
+        setBossExplanationMessage("neutral", "なんでそれで！？でも効いてる！");
+        playBattleEffect(els.ultimateBeamImage, "fire");
+        playUltimateByType(bossBattleState.specialType);
+      }, chargeTime);
+      setTimeout(() => {
+        playEnemyDefeat();
+      }, chargeTime + attackTime);
+      setTimeout(() => {
+        setHeroPose("victory");
+        setBossExplanationMessage("correct", "勝利！全問正解！");
+      }, chargeTime + attackTime + defeatTime);
+    }
+
+    function playEnemyDefeat() {
+      const defeatClasses = ["blasted-spin", "blasted-up", "blasted-skew", "blasted-crash", "blasted-bounce", "blasted-aura"];
+      defeatClasses.forEach((className) => els.bossMonster.classList.remove(className));
+      const selected = defeatClasses[Math.floor(Math.random() * defeatClasses.length)];
+      playBattleEffect(els.bossMonster, selected);
+    }
+
+    function playUltimateByType(type) {
+      const ultimateLabels = {
+        broom: "🧹💨",
+        car: "🚗💨",
+        eraser: "🧽",
+        washer: "🧼🫧",
+        print: "📄📄",
+        bagPush: "🎒",
+        pencilRocket: "✏️🚀",
+        eraserRoller: "🧽🌀",
+        rulerSlash: "📏⚡",
+        trayCannon: "🍱💥",
+        shoeDash: "👟💨",
+        notebookFlash: "📒✨",
+        recorderSonic: "🎵📯",
+        chalkMissile: "▭▭▭",
+        tapeWrap: "🌀",
+        fartBarrier: "🫧💨",
+        poopAvoid: "💩!?",
+        dustpanPusun: "🧹🧺",
+        jumpRopeSpin: "➰",
+        waterBottleSplash: "水筒💦"
+      };
+      spawnUltimateProp(type, ultimateLabels[type] || ultimateLabels.broom);
+    }
+
+    function spawnUltimateProp(type, label) {
+      const prop = document.createElement("span");
+      prop.className = `ultimate-prop ${type}`;
+      prop.textContent = label;
+      els.particleLayer.appendChild(prop);
+      setTimeout(() => prop.remove(), ULTIMATE_ATTACK_TIME + 240);
+    }
+
+    function playPusunFail() {
+      const short = els.shortFxToggle.checked;
+      refreshBossSpecial();
+      setHeroPose("ready");
+      setHeroAuraLevel(0);
+      els.bossFinalCall.textContent = "必殺技を出すぞ！";
+      setBossExplanationMessage("neutral", "グググッ……パワーを集めるよ！");
+      playBattleEffect(els.heroCharacter, "ready");
+      playBattleEffect(els.specialGaugeFill, "charge");
+      playBattleEffect(els.bossBattleCard, "flash");
+      setTimeout(() => {
+        els.bossFinalCall.textContent = `${bossBattleState.specialName.slice(0, Math.max(5, Math.floor(bossBattleState.specialName.length / 2)))}……？`;
+        setBossExplanationMessage("neutral", "……あれ？");
+      }, short ? 180 : 700);
+      setTimeout(() => {
+        playBattleEffect(els.specialGaugeFill, "fizzle");
+        setHeroPose("sad");
+        setBossExplanationMessage("neutral", "ゲージがしゅん……");
+      }, short ? 360 : 1300);
+      setTimeout(() => {
+        playBattleEffect(els.bossSmoke, "puff");
+        playBattleEffect(els.puffText, "show");
+        spawnPusunSmoke();
+        playSound("fizzle");
+      }, short ? 520 : 1800);
+      setTimeout(() => {
+        setBossExplanationMessage("wrong", "プスン……");
+        setHeroPose("sad");
+        playBattleEffect(els.heroCharacter, "sad");
+      }, short ? 700 : 2300);
+      setTimeout(() => {
+        playBattleEffect(els.bossMonster, "gloated");
+        spawnWrongBurst("あと少し！");
+        setBossExplanationMessage("wrong", "敵がニヤリ！");
+      }, short ? 860 : 2800);
+      setTimeout(() => {
+        playBattleEffect(els.bossMonster, "boss-counter");
+        setBossExplanationMessage("wrong", "ボスのコミカル反撃！");
+      }, short ? 1000 : 3250);
+      setTimeout(() => {
+        playHeroDefeat();
+        setBossExplanationMessage("wrong", "プスン…… あと少し！もう一回チャレンジ！");
+      }, short ? 1200 : 3800);
+    }
+
+    function playHeroDefeat() {
+      setHeroPose("blown");
+      playBattleEffect(els.heroCharacter, "hero-blown-away");
+      els.heroCharacter.classList.add("hero-dizzy");
+    }
+
+    function showChargeText() {
+      const percent = bossBattleState.score * 20;
+      els.chargeText.textContent = percent === 100 ? "MAX!! 必殺技準備完了!" : (percent >= 60 ? `必殺技パワー ${percent}%!` : "チャージ +20%!");
+      playBattleEffect(els.chargeText, "show");
+    }
+
+    function spawnAnswerBurst(kind, answerText) {
+      const isCorrect = kind === "correct";
+      els.answerBurst.className = `answer-burst ${kind}`;
+      els.answerBurst.innerHTML = `
+        <span class="burst-main">${isCorrect ? "✅ 正解！" : "💡 惜しい！"}</span>
+        <span class="burst-sub"></span>
+      `;
+      playBattleEffect(els.answerBurst, "show");
+    }
+
+    function spawnCorrectBurst(answerText) {
+      spawnAnswerBurst("correct", answerText);
+    }
+
+    function spawnWrongBurst(answerText) {
+      spawnAnswerBurst("wrong", answerText);
+    }
+
+    function spawnChargeParticles(answerText) {
+      const labels = ["✦", "+20%", answerText || "OK!"];
+      for (let i = 0; i < 3; i++) {
+        spawnParticle(labels[i % labels.length], {
+          x: 18 + Math.random() * 12,
+          y: 34 + Math.random() * 26,
+          dx: 112 + Math.random() * 54,
+          dy: -54 - Math.random() * 38,
+          color: ["#ffd66b", "#67d477", "#66e8ff", "#ffffff"][i % 4],
+          size: 0.68 + Math.random() * 0.32,
+          duration: 1.95 + Math.random() * 0.35
+        });
+      }
+    }
+
+    function spawnUltimateParticles(type = "attack") {
+      const labelsByType = {
+        charge: ["★", "✦", "MAX!!", "100%", bossBattleState.specialName],
+        broom: ["ほこり", "サササー", "am", "are", "is", "🧹"],
+        car: ["ブーン", "安全第一", "they are", "🚗", "OK!"],
+        eraser: ["けしけし", "チョーク粉", "a/an", "なし", "🧽"],
+        washer: ["ぐるぐる", "泡", "are", "is", "🫧"],
+        print: ["プリント", "宿題", "英語", "📄", "Yes!"],
+        bagPush: ["ぐいぐい", "通学路", "I am", "🎒", "+20%"],
+        hit: ["★", "✦", "ドカン", "やった!", bossBattleState.specialName]
+      };
+      const labels = labelsByType[type] || labelsByType.hit;
+      const count = type === "charge" ? 28 : 34;
+      for (let i = 0; i < count; i++) {
+        spawnParticle(labels[i % labels.length], {
+          className: "ultimate",
+          x: 26 + Math.random() * 55,
+          y: 22 + Math.random() * 50,
+          dx: -160 + Math.random() * 320,
+          dy: -130 + Math.random() * 210,
+          color: ["#ffd66b", "#ff5ad1", "#66e8ff", "#ffffff", "#67d477"][i % 5],
+          size: 0.76 + Math.random() * 1.05,
+          duration: 2.2 + Math.random() * 1.25
+        });
+      }
+    }
+
+    function spawnPusunSmoke() {
+      spawnAnswerBurst("wrong", "ゲージ不足");
+      for (let i = 0; i < 18; i++) {
+        spawnParticle("", {
+          className: "smoke-bit",
+          x: 30 + Math.random() * 24,
+          y: 36 + Math.random() * 22,
+          dx: -120 + Math.random() * 240,
+          dy: -70 - Math.random() * 70,
+          size: 18 + Math.random() * 28,
+          duration: 0.95 + Math.random() * 0.65
+        });
+      }
+      for (let i = 0; i < 8; i++) {
+        spawnParticle(i % 2 ? "汗" : "💧", {
+          x: 18 + Math.random() * 10,
+          y: 30 + Math.random() * 24,
+          dx: -30 + Math.random() * 80,
+          dy: -30 + Math.random() * 70,
+          color: "#66e8ff",
+          size: 0.8 + Math.random() * 0.7,
+          duration: 0.85 + Math.random() * 0.45
+        });
+      }
+    }
+
+    function spawnParticle(text, options = {}) {
+      const particle = document.createElement("span");
+      particle.className = `battle-particle ${options.className || ""}`.trim();
+      particle.textContent = text;
+      particle.style.setProperty("--x", `${options.x ?? 50}%`);
+      particle.style.setProperty("--y", `${options.y ?? 50}%`);
+      particle.style.setProperty("--dx", `${options.dx ?? 80}px`);
+      particle.style.setProperty("--dy", `${options.dy ?? -80}px`);
+      particle.style.setProperty("--rot", `${-180 + Math.random() * 360}deg`);
+      particle.style.setProperty("--color", options.color || "#ffd66b");
+      particle.style.setProperty("--size", `${options.size || 1}rem`);
+      if (options.className === "smoke-bit") {
+        particle.style.setProperty("--size", `${options.size || 28}px`);
+      }
+      particle.style.setProperty("--dur", `${options.duration || 1}s`);
+      els.particleLayer.appendChild(particle);
+      setTimeout(() => particle.remove(), Math.ceil((options.duration || 1) * 1000) + 120);
+    }
+
+    function clearBattleParticles() {
+      els.particleLayer.innerHTML = "";
+    }
+
+    function scrollBossIntoView() {
+      els.bossBattleCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function playSound(type) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!els.soundToggle.checked || !AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const freqs = { ok: 660, miss: 240, special: 880, fizzle: 140 };
+      osc.frequency.value = freqs[type] || 440;
+      osc.type = type === "fizzle" ? "sawtooth" : "sine";
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (type === "special" ? 0.35 : 0.18));
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + (type === "special" ? 0.38 : 0.2));
+    }
+
+    function playBattleEffect(element, className) {
+      resetBattleEffect(element, className);
+      element.classList.add(className);
+    }
+
+    function resetBattleEffect(element, className) {
+      element.classList.remove(className);
+      void element.offsetWidth;
+    }
+
+    function loadHeroFace(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      openCropEditor(file, "hero");
+    }
+
+    function loadBossFace(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      openCropEditor(file, "boss");
+    }
+
+    function openCropEditor(file, target) {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        const image = new Image();
+        image.addEventListener("load", () => {
+          cropState.target = target;
+          cropState.image = image;
+          resetCrop();
+          els.cropTitle.textContent = target === "hero" ? "主人公の顔を合わせよう" : "ボスの顔を合わせよう";
+          els.cropPanel.classList.add("show");
+          setBossExplanationMessage("neutral", "丸の中に顔が入るように、写真を動かしてね。");
+          drawCropCanvas();
+          els.cropPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+        image.src = reader.result;
+      });
+      reader.readAsDataURL(file);
+    }
+
+    function resetCrop() {
+      cropState.panX = 0;
+      cropState.panY = 0;
+      cropState.scale = 1;
+      els.cropScale.value = "1";
+    }
+
+    function drawCropCanvas() {
+      const canvas = els.cropCanvas;
+      const ctx = canvas.getContext("2d");
+      const image = cropState.image;
+      if (!image) return;
+      const size = canvas.width;
+      ctx.clearRect(0, 0, size, size);
+      ctx.fillStyle = "#101828";
+      ctx.fillRect(0, 0, size, size);
+
+      const base = Math.max(size / image.width, size / image.height);
+      const drawWidth = image.width * base * cropState.scale;
+      const drawHeight = image.height * base * cropState.scale;
+      const x = (size - drawWidth) / 2 + cropState.panX;
+      const y = (size - drawHeight) / 2 + cropState.panY;
+      ctx.drawImage(image, x, y, drawWidth, drawHeight);
+
+      ctx.save();
+      ctx.fillStyle = "rgba(0, 0, 0, 0.52)";
+      ctx.beginPath();
+      ctx.rect(0, 0, size, size);
+      ctx.arc(size / 2, size / 2, size * 0.36, 0, Math.PI * 2, true);
+      ctx.fill("evenodd");
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size * 0.36, 0, Math.PI * 2);
+      ctx.strokeStyle = "#ffd66b";
+      ctx.lineWidth = 7;
+      ctx.stroke();
+    }
+
+    function applyCrop() {
+      const source = els.cropCanvas;
+      const output = document.createElement("canvas");
+      const size = 320;
+      output.width = size;
+      output.height = size;
+      const ctx = output.getContext("2d");
+      ctx.clearRect(0, 0, size, size);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2 - 4, 0, Math.PI * 2);
+      ctx.clip();
+      const cropSize = source.width * 0.72;
+      const cropStart = (source.width - cropSize) / 2;
+      ctx.drawImage(source, cropStart, cropStart, cropSize, cropSize, 0, 0, size, size);
+      ctx.restore();
+      const dataUrl = output.toDataURL("image/png");
+
+      if (cropState.target === "hero") {
+        els.heroFace.src = dataUrl;
+        setBossExplanationMessage("neutral", "主人公の顔をセットしたよ。この端末の画面だけで使います。");
+      } else {
+        els.bossFace.src = dataUrl;
+        bossBattleState.customBossFace = true;
+        setupBossForLevel();
+        setBossExplanationMessage("neutral", "ボスの顔をセットしたよ。邪悪オーラをまとったよ！");
+      }
+      closeCropEditor();
+    }
+
+    function closeCropEditor() {
+      els.cropPanel.classList.remove("show");
+      cropState.image = null;
+      els.faceUpload.value = "";
+      els.bossFaceUpload.value = "";
+    }
+
+    function cropPointerPosition(event) {
+      const point = event.touches ? event.touches[0] : event;
+      return { x: point.clientX, y: point.clientY };
+    }
+
+    function startCropDrag(event) {
+      if (!cropState.image) return;
+      event.preventDefault();
+      const point = cropPointerPosition(event);
+      cropState.dragging = true;
+      cropState.lastX = point.x;
+      cropState.lastY = point.y;
+    }
+
+    function moveCropDrag(event) {
+      if (!cropState.dragging) return;
+      event.preventDefault();
+      const point = cropPointerPosition(event);
+      cropState.panX += point.x - cropState.lastX;
+      cropState.panY += point.y - cropState.lastY;
+      cropState.lastX = point.x;
+      cropState.lastY = point.y;
+      drawCropCanvas();
+    }
+
+    function stopCropDrag() {
+      cropState.dragging = false;
+    }
+
+    function zoomCropWithWheel(event) {
+      if (!cropState.image) return;
+      event.preventDefault();
+      const next = Math.max(0.6, Math.min(3, cropState.scale + (event.deltaY > 0 ? -0.08 : 0.08)));
+      cropState.scale = next;
+      els.cropScale.value = String(next);
+      drawCropCanvas();
+    }
+
+    document.querySelectorAll(".level-button").forEach((button) => {
+      button.addEventListener("click", () => startBossBattle(Number(button.dataset.level)));
+    });
+
+    els.retryLevelButton.addEventListener("click", () => startLevel(state.currentLevel));
+    els.nextLevelButton.addEventListener("click", () => {
+      const passed = state.score >= 4;
+      const nextLevel = passed ? Math.min(state.currentLevel + 1, 6) : state.currentLevel;
+      startLevel(nextLevel, passed ? "レベルアップ！次は少しむずかしくなるよ" : undefined);
+    });
+
+    els.bossModeButton.addEventListener("click", () => startLevel(state.currentLevel || 1));
+    els.bossRetryButton.addEventListener("click", () => startBossBattle(bossBattleState.selectedLevel));
+    els.bossNextLevelButton.addEventListener("click", () => {
+      startBossBattle(Math.min(bossBattleState.selectedLevel + 1, 6));
+    });
+    els.faceUpload.addEventListener("change", loadHeroFace);
+    els.bossFaceUpload.addEventListener("change", loadBossFace);
+    els.cropApplyButton.addEventListener("click", applyCrop);
+    els.cropResetButton.addEventListener("click", () => {
+      resetCrop();
+      drawCropCanvas();
+    });
+    els.cropCancelButton.addEventListener("click", closeCropEditor);
+    els.cropScale.addEventListener("input", () => {
+      cropState.scale = Number(els.cropScale.value);
+      drawCropCanvas();
+    });
+    els.cropCanvas.addEventListener("mousedown", startCropDrag);
+    els.cropCanvas.addEventListener("touchstart", startCropDrag, { passive: false });
+    window.addEventListener("mousemove", moveCropDrag);
+    window.addEventListener("touchmove", moveCropDrag, { passive: false });
+    window.addEventListener("mouseup", stopCropDrag);
+    window.addEventListener("touchend", stopCropDrag);
+    els.cropCanvas.addEventListener("wheel", zoomCropWithWheel, { passive: false });
+
+    startBossBattle(1);
+  </script>
+</body>
+</html>
