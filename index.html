@@ -1066,6 +1066,46 @@
         linear-gradient(135deg, #301044, #891f55 58%, #171021);
     }
 
+    .boss-monster.has-art {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    .boss-monster.has-art::before,
+    .boss-monster.has-art::after,
+    .boss-monster.has-art .boss-mouth {
+      display: none;
+    }
+
+    .enemy-art {
+      position: absolute;
+      inset: -20% -20% -14%;
+      width: 140%;
+      height: 140%;
+      object-fit: contain;
+      pointer-events: none;
+      filter: drop-shadow(0 12px 0 rgba(36, 48, 71, 0.18)) drop-shadow(0 0 20px rgba(110, 32, 149, 0.48));
+      transition: opacity 0.28s ease, transform 0.28s ease, filter 0.28s ease;
+    }
+
+    .enemy-art-defeated {
+      opacity: 0;
+      transform: scale(0.92) rotate(-5deg);
+      filter: drop-shadow(0 8px 0 rgba(36, 48, 71, 0.12));
+    }
+
+    .boss-monster.has-art.defeated-art .enemy-art-normal {
+      opacity: 0;
+      transform: scale(0.76) rotate(14deg);
+    }
+
+    .boss-monster.has-art.defeated-art .enemy-art-defeated {
+      opacity: 1;
+      transform: scale(1.05) rotate(-3deg);
+    }
+
     .boss-monster.level-1 {
       border-radius: 50% 50% 34% 34%;
       background:
@@ -1109,6 +1149,17 @@
         radial-gradient(circle at 65% 38%, #ff143f 0 9px, transparent 10px),
         linear-gradient(135deg, #120719, #6b168f 44%, #ff2f6d);
       box-shadow: 0 0 30px rgba(255, 47, 109, 0.58), 0 9px 0 rgba(36, 48, 71, 0.2);
+    }
+
+    .boss-monster.has-art,
+    .boss-monster.has-art.level-1,
+    .boss-monster.has-art.level-2,
+    .boss-monster.has-art.level-3,
+    .boss-monster.has-art.level-4,
+    .boss-monster.has-art.level-5,
+    .boss-monster.has-art.level-6 {
+      background: transparent;
+      box-shadow: none;
     }
 
     .boss-aura {
@@ -1300,7 +1351,33 @@
       white-space: nowrap;
     }
 
-    .ultimate-prop.waterBottleSplash {
+    .ultimate-prop.image-prop {
+      width: clamp(180px, 38vw, 360px);
+      height: clamp(120px, 25vw, 240px);
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      object-fit: contain;
+      transform-origin: center;
+      filter: drop-shadow(0 14px 0 rgba(36, 48, 71, 0.2)) drop-shadow(0 0 18px rgba(255, 214, 107, 0.76));
+    }
+
+    .ultimate-prop.image-prop.chalkMissile,
+    .ultimate-prop.image-prop.waterBottleSplash,
+    .ultimate-prop.image-prop.print,
+    .ultimate-prop.image-prop.tapeWrap {
+      width: clamp(210px, 46vw, 430px);
+      height: clamp(130px, 28vw, 260px);
+    }
+
+    .ultimate-prop.image-prop.fartBarrier {
+      width: clamp(220px, 48vw, 440px);
+      height: clamp(150px, 30vw, 290px);
+      left: 0;
+      top: 24%;
+    }
+
+    .ultimate-prop.waterBottleSplash:not(.image-prop) {
       font-size: clamp(3.4rem, 12vw, 7rem);
       color: #315ad8;
       background: linear-gradient(180deg, #e4fbff, #9fe7ff 46%, #4f7cff);
@@ -1310,6 +1387,7 @@
     }
 
     .ultimate-prop.broom { animation: broomUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.zokinSweep { animation: broomUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.car { animation: carUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.eraser { animation: eraserUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.washer { animation: washerUltimate 1.8s ease-in-out forwards; }
@@ -1323,6 +1401,8 @@
     .ultimate-prop.notebookFlash { animation: printUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.recorderSonic { animation: washerUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.chalkMissile { animation: carUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.blackboardEraser { animation: eraserUltimate 1.8s ease-in-out forwards; }
+    .ultimate-prop.flyingPants { animation: carUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.tapeWrap { animation: washerUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.fartBarrier { animation: bagPushUltimate 1.8s ease-in-out forwards; }
     .ultimate-prop.poopAvoid { animation: broomUltimate 1.8s ease-in-out forwards; }
@@ -2219,7 +2299,7 @@
           <div class="particle-layer" id="particleLayer"></div>
           <div class="answer-burst" id="answerBurst"></div>
           <div class="beam" id="bossBeam"></div>
-          <img class="ultimate-beam-image" id="ultimateBeamImage" src="assets/effects/ultimate-beam.png" alt="" aria-hidden="true">
+          <img class="ultimate-beam-image" id="ultimateBeamImage" src="assets/attacks/beam/attack_yellow_beam_max.png" alt="" aria-hidden="true">
           <div class="smoke" id="bossSmoke"></div>
           <div class="puff-text" id="puffText">プスン……</div>
 
@@ -2252,6 +2332,8 @@
           <div class="boss-wrap">
             <div class="boss-monster" id="bossMonster" aria-hidden="true">
               <div class="boss-aura"></div>
+              <img class="enemy-art enemy-art-normal" id="enemyArtNormal" alt="">
+              <img class="enemy-art enemy-art-defeated" id="enemyArtDefeated" alt="">
               <img class="boss-face-img" id="bossFace" alt="">
               <div class="boss-mouth"></div>
             </div>
@@ -3247,11 +3329,11 @@
     ];
 
     const adjectiveWords = [
-      { word: "sad", jp: "かなしい" },
-      { word: "hungry", jp: "おなかがすいている" },
-      { word: "angry", jp: "おこっている" },
-      { word: "tired", jp: "つかれている" },
-      { word: "good", jp: "元気な" }
+      { word: "sad", jpStatement: "かなしいです", jpQuestion: "かなしいですか" },
+      { word: "hungry", jpStatement: "おなかがすいています", jpQuestion: "おなかがすいていますか" },
+      { word: "angry", jpStatement: "おこっています", jpQuestion: "おこっていますか" },
+      { word: "tired", jpStatement: "つかれています", jpQuestion: "つかれていますか" },
+      { word: "good", jpStatement: "元気です", jpQuestion: "元気ですか" }
     ];
 
     const adjectiveSubjects = [
@@ -3261,14 +3343,14 @@
       { key: "they", subject: "They", questionSubject: "they", be: "are", startBe: "Are", yes: "they are", no: "aren’t", noPrompt: "they ___", jp: "かれら" }
     ];
 
-    adjectiveWords.forEach(({ word, jp }) => {
+    adjectiveWords.forEach(({ word, jpStatement, jpQuestion }) => {
       questions.push({
         id: `l1-i-am-${word}`,
         level: 1,
         type: "choice",
         questionText: "空らんに入る言葉を選ぼう",
         sentenceHtml: `I ___ ${word}.`,
-        japaneseMeaning: `わたしは ${jp}です。`,
+        japaneseMeaning: `わたしは ${jpStatement}。`,
         choices: ["am", "are", "is"],
         answer: "am",
         explanation: "I は am と仲よし。"
@@ -3280,7 +3362,7 @@
           type: "choice",
           questionText: "空らんに入る言葉を選ぼう",
           sentenceHtml: `${item.subject} ___ ${word}.`,
-          japaneseMeaning: `${item.jp}は ${jp}です。`,
+          japaneseMeaning: `${item.jp}は ${jpStatement}。`,
           choices: ["am", "are", "is"],
           answer: item.be,
           explanation: `${item.questionSubject} は ${item.be} と仲よし。`
@@ -3291,7 +3373,7 @@
           type: "choice",
           questionText: "疑問文のはじめを選ぼう",
           sentenceHtml: `___ ${item.questionSubject} ${word}?`,
-          japaneseMeaning: `${item.jp}は ${jp}ですか。`,
+          japaneseMeaning: `${item.jp}は ${jpQuestion}。`,
           choices: ["Am", "Are", "Is"],
           answer: item.startBe,
           explanation: `${item.questionSubject} は ${item.be} と仲よし。疑問文では ${item.startBe} を前に出します。`
@@ -3302,7 +3384,7 @@
           type: "choice",
           questionText: "Yes の答え方を選ぼう",
           sentenceHtml: `${item.startBe} ${item.questionSubject} ${word}?<br>Yes, ___ ___.`,
-          japaneseMeaning: `${item.jp}は ${jp}ですか。はい、そうです。`,
+          japaneseMeaning: `${item.jp}は ${jpQuestion}。はい、そうです。`,
           choices: [item.yes, item.key === "you" ? "you are" : "it is", item.be === "are" ? "it is" : "they are"],
           answer: item.yes,
           explanation: item.key === "you" ? "you で聞かれたら、答える人は「私」なので Yes, I am. です。" : `${item.questionSubject} の Yes は ${item.yes} で答えます。`
@@ -3313,7 +3395,7 @@
           type: "choice",
           questionText: "No の答え方を選ぼう",
           sentenceHtml: `${item.startBe} ${item.questionSubject} ${word}?<br>No, ${item.noPrompt}.`,
-          japaneseMeaning: `${item.jp}は ${jp}ですか。いいえ、ちがいます。`,
+          japaneseMeaning: `${item.jp}は ${jpQuestion}。いいえ、ちがいます。`,
           choices: [item.no, item.key === "you" ? "you aren’t" : "aren’t", "isn’t"],
           answer: item.no,
           explanation: item.key === "you" ? "Are you ...? は聞かれた人が答えるので、No, I’m not. です。" : `No のときは ${item.no} を使います。`
@@ -3324,7 +3406,7 @@
           type: "speaking",
           questionText: "こえに出して答えよう",
           sentenceHtml: `${item.startBe} ${item.questionSubject} ${word}?`,
-          japaneseMeaning: `${item.jp}は ${jp}ですか。`,
+          japaneseMeaning: `${item.jp}は ${jpQuestion}。`,
           modelAnswers: item.key === "you" ? ["Yes, I am.", "No, I’m not."] : [`Yes, ${item.yes}.`, `No, ${item.key} ${item.no}.`],
           explanation: item.key === "you" ? "Are you ...? は Yes, I am. / No, I’m not. で答えます。" : `${item.questionSubject} は ${item.be} と仲よし。Yes / No で答えます。`
         });
@@ -3355,13 +3437,13 @@
         { name: "He is 消しゴムローラー", type: "eraserRoller" },
         { name: "She is キラキラ下じきビーム", type: "rulerSlash" },
         { name: "They are うわばきダッシュ", type: "shoeDash" },
-        { name: "You are 黒板消しクラッシュ", type: "eraserRoller" },
-        { name: "This is ぞうきんスピン", type: "broom" },
+        { name: "You are 黒板消しクラッシュ", type: "blackboardEraser" },
+        { name: "This is ぞうきんスピン", type: "zokinSweep" },
         { name: "I am 給食トレーシールド", type: "trayCannon" },
         { name: "You are 水筒スプラッシュ", type: "waterBottleSplash" },
         { name: "They are なわとびぐるぐる", type: "jumpRopeSpin" },
         { name: "He is チョークミサイル", type: "chalkMissile" },
-        { name: "He is フライングパンツ", type: "shoeDash" },
+        { name: "He is フライングパンツ", type: "flyingPants" },
         { name: "She is 連絡帳フラッシュ", type: "notebookFlash" },
         { name: "This is お道具箱バースト", type: "print" },
         { name: "I am えんぴつけずりタイフーン", type: "pencilRocket" },
@@ -3375,9 +3457,9 @@
         { name: "Are they ひっくり返しアタック", type: "washer" },
         { name: "Is this ブーメラン", type: "broom" },
         { name: "Are you トルネード", type: "broom" },
-        { name: "Is he 黒板消しダイブ", type: "eraserRoller" },
+        { name: "Is he 黒板消しダイブ", type: "blackboardEraser" },
         { name: "Is she チョークスプラッシュ", type: "chalkMissile" },
-        { name: "Are they うわばきハリケーン", type: "shoeDash" },        { name: "Is this ぞうきんスラッシュ", type: "broom" },
+        { name: "Are they うわばきハリケーン", type: "shoeDash" },        { name: "Is this ぞうきんスラッシュ", type: "zokinSweep" },
         { name: "Is that ちりとりキャノン", type: "dustpanPusun" },
         { name: "Are these 定規カッター", type: "rulerSlash" },
         { name: "Are those 分度器ブーメラン", type: "rulerSlash" },
@@ -3398,7 +3480,7 @@
         { name: "Yes, I am えんぴつビーム", type: "pencilRocket" },
         { name: "No, I’m not おならバリア", type: "fartBarrier" },
         { name: "Yes, he is 消しゴムパンチ", type: "eraserRoller" },
-        { name: "No, he isn’t ぞうきんガード", type: "broom" },
+        { name: "No, he isn’t ぞうきんガード", type: "zokinSweep" },
         { name: "Yes, she is リコーダーソニック", type: "recorderSonic" },
         { name: "No, she isn’t 下じきシールド", type: "rulerSlash" },
         { name: "Yes, they are 給食トレーキャノン", type: "trayCannon" },
@@ -3432,7 +3514,7 @@
         { name: "This is 給食トレーアタック", type: "trayCannon" },
         { name: "Are you リコーダービーム", type: "recorderSonic" },
         { name: "Is this ぞうきんスピン", type: "broom" },
-        { name: "Yes, it is 黒板消し", type: "eraserRoller" }
+        { name: "Yes, it is 黒板消し", type: "blackboardEraser" }
       ],
       level5: [
         { name: "This is 消しゴムスラッシュ", type: "eraser" },
@@ -3450,7 +3532,7 @@
         { name: "a book 本だなクラッシュ", type: "print" },
         { name: "an egg たまごスプラッシュ", type: "waterBottleSplash" },
         { name: "This is 消しゴムスラッシュ", type: "eraserRoller" },
-        { name: "Those are ぞうきんスイープ", type: "broom" },
+        { name: "Those are ぞうきんスイープ", type: "zokinSweep" },
         { name: "These are プリント雪崩", type: "print" },
         { name: "Those are うわばき大行進", type: "shoeDash" },
         { name: "my pen 所有パンチ", type: "bagPush" },
@@ -3477,7 +3559,7 @@
         { name: "These are りんごミサイル", type: "car" },
         { name: "Are you トルネード", type: "broom" },
         { name: "Are you うんち", type: "poopAvoid" },
-        { name: "This is ぞうきんスラッシュ", type: "broom" },
+        { name: "This is ぞうきんスラッシュ", type: "zokinSweep" },
         { name: "They are うわばきダッシュ", type: "shoeDash" },
         { name: "Yes, I am えんぴつビーム", type: "pencilRocket" },
         { name: "No, I’m not おならバリア", type: "fartBarrier" },
@@ -3488,9 +3570,9 @@
         { name: "my pen 所有パンチ", type: "bagPush" },
         { name: "No, it isn’t ちりとりプスン", type: "dustpanPusun" },
         { name: "Yes, they are ランドセルプッシュ", type: "bagPush" },
-        { name: "You are 黒板消しクラッシュ", type: "eraserRoller" },
+        { name: "You are 黒板消しクラッシュ", type: "blackboardEraser" },
         { name: "Are you ほうきスイープ", type: "broom" },
-        { name: "Those are ぞうきんスイープ", type: "broom" },
+        { name: "Those are ぞうきんスイープ", type: "zokinSweep" },
         { name: "they are みんなでドーン", type: "trayCannon" },
         { name: "This is 下じきバリア", type: "rulerSlash" },
         { name: "Are those 分度器ブーメラン", type: "rulerSlash" },
@@ -3505,6 +3587,8 @@
         className: "level-1",
         label: "レベル1",
         subtitle: "be動詞スライムを倒そう。am / are / is を選ぶステージ！",
+        enemyArt: "assets/enemies/slime/enemy_slime_normal.png",
+        defeatedArt: "assets/enemies/slime/enemy_slime_defeated.png",
         specials: specialMoves.level1
       },
       2: {
@@ -3512,6 +3596,8 @@
         className: "level-2",
         label: "レベル2",
         subtitle: "be動詞を文の前に出して、ぎもん文コウモリを倒そう！",
+        enemyArt: "assets/enemies/question_bat/enemy_question_bat_normal.png",
+        defeatedArt: "assets/enemies/question_bat/enemy_question_bat_defeated.png",
         specials: specialMoves.level2
       },
       3: {
@@ -3519,6 +3605,8 @@
         className: "level-3",
         label: "レベル3",
         subtitle: "Yes / No の返事で、石の敵をやっつけよう！",
+        enemyArt: "assets/enemies/golem/enemy_golem_normal.png",
+        defeatedArt: "assets/enemies/golem/enemy_golem_defeated.png",
         specials: specialMoves.level3
       },
       4: {
@@ -3526,6 +3614,8 @@
         className: "level-4",
         label: "レベル4",
         subtitle: "声に出して答えるステージ。親ができたら採点！",
+        enemyArt: "assets/enemies/dragon/enemy_dragon_normal.png",
+        defeatedArt: "assets/enemies/dragon/enemy_dragon_defeated_music.png",
         specials: specialMoves.level4
       },
       5: {
@@ -3533,6 +3623,8 @@
         className: "level-5",
         label: "レベル5",
         subtitle: "1つ・2つ以上をまちがえさせるゾンビを倒そう！",
+        enemyArt: "assets/enemies/zombie/enemy_zombie_normal.png",
+        defeatedArt: "assets/enemies/zombie/enemy_zombie_defeated_papers.png",
         specials: specialMoves.level5
       },
       6: {
@@ -3540,6 +3632,8 @@
         className: "level-6",
         label: "レベル6",
         subtitle: "最後は全部まぜまぜ。ラスボスを倒そう！",
+        enemyArt: "assets/enemies/king/enemy_king_normal.png",
+        defeatedArt: "assets/enemies/king/enemy_king_defeated.png",
         specials: specialMoves.level6
       }
     };
@@ -3567,6 +3661,29 @@
     const AUTO_NEXT_DELAY_CORRECT_SHORT = 2300;
     const AUTO_NEXT_DELAY_WRONG_SHORT = 3000;
     const AUTO_NEXT_EXTRA_SLOW = 3000;
+
+    const attackArtByType = {
+      broom: "assets/attacks/cleaning/attack_broom_sweep.png",
+      eraser: "assets/attacks/school_items/attack_eraser_roller.png",
+      print: "assets/attacks/school_items/attack_print_avalanche.png",
+      bagPush: "assets/attacks/school_items/attack_randoseru_push.png",
+      pencilRocket: "assets/attacks/school_items/attack_pencil_rocket.png",
+      eraserRoller: "assets/attacks/school_items/attack_eraser_roller.png",
+      rulerSlash: "assets/attacks/school_items/attack_ruler_slash.png",
+      trayCannon: "assets/attacks/school_items/attack_lunch_tray_cannon.png",
+      shoeDash: "assets/attacks/school_items/attack_uwabaki_dash.png",
+      notebookFlash: "assets/attacks/school_items/attack_print_avalanche.png",
+      recorderSonic: "assets/attacks/school_items/attack_recorder_sonic.png",
+      chalkMissile: "assets/attacks/school_items/attack_chalk_missile.png",
+      blackboardEraser: "assets/attacks/school_items/attack_blackboard_eraser_crash.png",
+      flyingPants: "assets/attacks/gag/attack_flying_pants_01.png",
+      tapeWrap: "assets/attacks/school_items/attack_tape_roll.png",
+      fartBarrier: "assets/effects/effect_fart_barrier.png",
+      poopAvoid: "assets/attacks/gag/attack_poop_dodge_gag.png",
+      dustpanPusun: "assets/effects/effect_small_puff_smoke.png",
+      waterBottleSplash: "assets/attacks/school_items/attack_water_bottle_splash.png",
+      zokinSweep: "assets/attacks/cleaning/attack_zokin_sweep.png"
+    };
 
     const cropState = {
       target: "hero",
@@ -3618,6 +3735,8 @@
       bossMonster: document.getElementById("bossMonster"),
       bossName: document.getElementById("bossName"),
       bossFace: document.getElementById("bossFace"),
+      enemyArtNormal: document.getElementById("enemyArtNormal"),
+      enemyArtDefeated: document.getElementById("enemyArtDefeated"),
       answerBurst: document.getElementById("answerBurst"),
       particleLayer: document.getElementById("particleLayer"),
       bossBeam: document.getElementById("bossBeam"),
@@ -3999,8 +4118,18 @@
 
     function setupBossForLevel() {
       const config = bossConfigs[bossBattleState.selectedLevel] || bossConfigs[1];
+      const useEnemyArt = Boolean(config.enemyArt && !bossBattleState.customBossFace);
       els.bossName.textContent = config.name;
-      els.bossMonster.className = `boss-monster ${config.className}${bossBattleState.customBossFace ? " custom" : ""}`;
+      els.bossMonster.className = `boss-monster ${config.className}${bossBattleState.customBossFace ? " custom" : ""}${useEnemyArt ? " has-art" : ""}`;
+      els.enemyArtNormal.hidden = !useEnemyArt;
+      els.enemyArtDefeated.hidden = !useEnemyArt;
+      if (useEnemyArt) {
+        els.enemyArtNormal.src = config.enemyArt;
+        els.enemyArtDefeated.src = config.defeatedArt || config.enemyArt;
+      } else {
+        els.enemyArtNormal.removeAttribute("src");
+        els.enemyArtDefeated.removeAttribute("src");
+      }
     }
 
     function currentBossQuestion() {
@@ -4260,6 +4389,9 @@
     function playEnemyDefeat() {
       const defeatClasses = ["blasted-spin", "blasted-up", "blasted-skew", "blasted-crash", "blasted-bounce", "blasted-aura"];
       defeatClasses.forEach((className) => els.bossMonster.classList.remove(className));
+      if (els.bossMonster.classList.contains("has-art")) {
+        els.bossMonster.classList.add("defeated-art");
+      }
       const selected = defeatClasses[Math.floor(Math.random() * defeatClasses.length)];
       playBattleEffect(els.bossMonster, selected);
     }
@@ -4280,6 +4412,8 @@
         notebookFlash: "📒✨",
         recorderSonic: "🎵📯",
         chalkMissile: "▭▭▭",
+        blackboardEraser: "黒板消し",
+        flyingPants: "パンツ",
         tapeWrap: "🌀",
         fartBarrier: "🫧💨",
         poopAvoid: "💩!?",
@@ -4291,9 +4425,16 @@
     }
 
     function spawnUltimateProp(type, label) {
-      const prop = document.createElement("span");
-      prop.className = `ultimate-prop ${type}`;
-      prop.textContent = label;
+      const imageSrc = attackArtByType[type];
+      const prop = document.createElement(imageSrc ? "img" : "span");
+      prop.className = `ultimate-prop ${type}${imageSrc ? " image-prop" : ""}`;
+      if (imageSrc) {
+        prop.src = imageSrc;
+        prop.alt = "";
+        prop.setAttribute("aria-hidden", "true");
+      } else {
+        prop.textContent = label;
+      }
       els.particleLayer.appendChild(prop);
       scheduleBattleEffect(() => prop.remove(), ULTIMATE_ATTACK_TIME + 240);
     }
