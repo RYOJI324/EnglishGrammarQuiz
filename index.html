@@ -90,7 +90,36 @@
       gap: 10px;
     }
 
+    .subject-nav {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(130px, 1fr));
+      gap: 10px;
+      max-width: 420px;
+      margin: 14px 0 10px;
+    }
+
+    .subject-button {
+      min-height: 48px;
+      border: 3px solid #243047;
+      border-radius: 16px;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 1.05rem;
+      font-weight: 950;
+      cursor: pointer;
+      box-shadow: 0 5px 0 rgba(36, 48, 71, 0.18);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .subject-button.active {
+      color: #ffffff;
+      background: #168a5a;
+      box-shadow: 0 8px 0 #0b5d3a;
+      transform: translateY(-2px);
+    }
+
     .level-button,
+    .subject-button,
     .mode-button,
     .choice-button,
     .action-button {
@@ -132,6 +161,7 @@
     }
 
     .level-button:focus-visible,
+    .subject-button:focus-visible,
     .mode-button:focus-visible,
     .choice-button:focus-visible,
     .action-button:focus-visible {
@@ -2204,11 +2234,15 @@
     <header>
       <div class="title-row">
         <div>
-          <h1>えいご これ・あれ クイズ</h1>
-          <p class="subtitle">be動詞・答え方・a/an をステージバトルで練習しよう</p>
+          <h1 id="appTitle">えいご これ・あれ クイズ</h1>
+          <p class="subtitle" id="appSubtitle">be動詞・答え方・a/an をステージバトルで練習しよう</p>
         </div>
         <div class="level-badge" id="levelBadge">レベル1：選ぶ</div>
       </div>
+      <nav class="subject-nav" aria-label="教科を選ぶ">
+        <button class="subject-button active" data-subject="english" type="button">英語</button>
+        <button class="subject-button" data-subject="math" type="button">算数</button>
+      </nav>
       <nav class="level-nav" aria-label="レベルを選ぶ">
         <button class="level-button active" data-level="1">レベル1：スライム</button>
         <button class="level-button" data-level="2">レベル2：コウモリ</button>
@@ -2309,7 +2343,7 @@
               <img class="hero-face" id="heroFace" alt="主人公の顔" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23ffd7b5'/%3E%3Ccircle cx='42' cy='50' r='8' fill='%23243047'/%3E%3Ccircle cx='78' cy='50' r='8' fill='%23243047'/%3E%3Cpath d='M42 78 Q60 92 78 78' fill='none' stroke='%23243047' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E">
               <div class="hero-body" aria-hidden="true"></div>
             </div>
-            <p class="hero-name">えいご勇者</p>
+            <p class="hero-name" id="heroName">えいご勇者</p>
           </div>
 
           <div class="vs-panel">
@@ -2387,6 +2421,35 @@
       4: "レベル4：音読",
       5: "レベル5：単数複数ゾンビ",
       6: "レベル6：ごちゃまぜ"
+    };
+
+    const subjectLabels = {
+      english: {
+        title: "えいご これ・あれ クイズ",
+        subtitle: "be動詞・答え方・a/an をステージバトルで練習しよう",
+        heroName: "えいご勇者",
+        practiceButton: "れんしゅう",
+        levelButtons: {
+          1: "レベル1：スライム",
+          2: "レベル2：コウモリ",
+          3: "レベル3：ゴーレム",
+          4: "レベル4：ドラゴン",
+          5: "レベル5：ゾンビ",
+          6: "レベル6：大王"
+        },
+        visibleLevels: [1, 2, 3, 4, 5, 6]
+      },
+      math: {
+        title: "さんすう たしざん バトル",
+        subtitle: "1けたのたしざんを3択で練習しよう",
+        heroName: "さんすう勇者",
+        practiceButton: "れんしゅう",
+        levelButtons: {
+          1: "レベル1：スライム",
+          2: "レベル2：こうもり"
+        },
+        visibleLevels: [1, 2]
+      }
     };
 
     const questions = [
@@ -3413,6 +3476,63 @@
       });
     });
 
+    function makeMathChoices(answer, maxChoice = 18) {
+      const choices = new Set([answer]);
+      const offsets = shuffle([-3, -2, -1, 1, 2, 3, 4, -4]);
+      offsets.forEach((offset) => {
+        const candidate = answer + offset;
+        if (candidate >= 0 && candidate <= maxChoice && choices.size < 3) {
+          choices.add(candidate);
+        }
+      });
+      while (choices.size < 3) {
+        choices.add(Math.floor(Math.random() * (maxChoice + 1)));
+      }
+      return shuffle([...choices]).map(String);
+    }
+
+    function makeMathAdditionQuestion(index, level) {
+      let a = Math.floor(Math.random() * 10);
+      let b = Math.floor(Math.random() * 10);
+      if (level === 1) {
+        let guard = 0;
+        while (a + b > 10 && guard < 80) {
+          a = Math.floor(Math.random() * 10);
+          b = Math.floor(Math.random() * 10);
+          guard += 1;
+        }
+      }
+      const answer = a + b;
+      const maxChoice = level === 1 ? 10 : 18;
+      return {
+        id: `math-l${level}-add-${index}-${a}-${b}`,
+        level,
+        type: "choice",
+        questionText: "こたえをえらぼう",
+        sentenceHtml: `${a} + ${b} = ?`,
+        japaneseMeaning: `${a} と ${b} を あわせると いくつ？`,
+        choices: makeMathChoices(answer, maxChoice),
+        answer: String(answer),
+        explanation: `${a} と ${b} を合わせると ${answer} です。`
+      };
+    }
+
+    function makeMathStageRound(level) {
+      if (level !== 1 && level !== 2) return [];
+      const seen = new Set();
+      const round = [];
+      let tries = 0;
+      while (round.length < 5 && tries < 80) {
+        tries += 1;
+        const question = makeMathAdditionQuestion(round.length + 1, level);
+        const key = question.sentenceHtml;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        round.push(question);
+      }
+      return round;
+    }
+
     const state = {
       currentLevel: 1,
       round: [],
@@ -3638,12 +3758,53 @@
       }
     };
 
+    const mathSpecialMoves = {
+      level1: [
+        { name: "1 + 2 = 3 えんぴつロケット", type: "pencilRocket" },
+        { name: "4 + 5 = 9 うわばきダッシュ", type: "shoeDash" },
+        { name: "2 + 6 = 8 消しゴムローラー", type: "eraserRoller" },
+        { name: "7 + 3 = 10 給食トレーキャノン", type: "trayCannon" },
+        { name: "5 + 5 = 10 ランドセルプッシュ", type: "bagPush" },
+        { name: "3 + 4 = 7 ぞうきんスイープ", type: "zokinSweep" }
+      ],
+      level2: [
+        { name: "8 + 7 = 15 えんぴつロケット", type: "pencilRocket" },
+        { name: "9 + 9 = 18 消しゴムローラー", type: "eraserRoller" },
+        { name: "6 + 8 = 14 うわばきダッシュ", type: "shoeDash" },
+        { name: "7 + 5 = 12 黒板消しクラッシュ", type: "blackboardEraser" },
+        { name: "4 + 9 = 13 給食トレーキャノン", type: "trayCannon" },
+        { name: "8 + 8 = 16 ランドセルプッシュ", type: "bagPush" }
+      ]
+    };
+
+    const mathBossConfigs = {
+      1: {
+        name: "たしざんスライム",
+        className: "level-1",
+        label: "レベル1",
+        subtitle: "1けたのたしざんで、たしざんスライムを倒そう！",
+        enemyArt: "assets/enemies/slime/enemy_slime_normal.png",
+        defeatedArt: "assets/enemies/slime/enemy_slime_defeated.png",
+        specials: mathSpecialMoves.level1
+      },
+      2: {
+        name: "たしざんこうもり",
+        className: "level-2",
+        label: "レベル2",
+        subtitle: "0〜9 + 0〜9 のたしざんで、たしざんこうもりを倒そう！",
+        enemyArt: "assets/enemies/question_bat/enemy_question_bat_normal.png",
+        defeatedArt: "assets/enemies/question_bat/enemy_question_bat_defeated.png",
+        specials: mathSpecialMoves.level2
+      }
+    };
+
     const bossBattleState = {
       round: [],
       index: 0,
       score: 0,
       answered: false,
       finished: false,
+      subject: "english",
       selectedLevel: 1,
       specialName: "",
       specialType: "broom",
@@ -3698,6 +3859,8 @@
 
     const els = {
       levelBadge: document.getElementById("levelBadge"),
+      appTitle: document.getElementById("appTitle"),
+      appSubtitle: document.getElementById("appSubtitle"),
       bossModeButton: document.getElementById("bossModeButton"),
       statusCard: document.getElementById("statusCard"),
       questionCounter: document.getElementById("questionCounter"),
@@ -3732,6 +3895,7 @@
       heroArt: document.getElementById("heroArt"),
       heroFace: document.getElementById("heroFace"),
       heroCharacter: document.getElementById("heroCharacter"),
+      heroName: document.getElementById("heroName"),
       bossMonster: document.getElementById("bossMonster"),
       bossName: document.getElementById("bossName"),
       bossFace: document.getElementById("bossFace"),
@@ -4019,6 +4183,9 @@
     }
 
     function makeStageRound(level) {
+      if (bossBattleState.subject === "math") {
+        return makeMathStageRound(level);
+      }
       const pool = questions.filter((question) => (
         level === 6
           ? question.level >= 1 && question.level <= 6
@@ -4027,9 +4194,53 @@
       return shuffle(pool).slice(0, 5);
     }
 
+    function getSubjectLabels() {
+      return subjectLabels[bossBattleState.subject] || subjectLabels.english;
+    }
+
+    function getBossConfigs() {
+      return bossBattleState.subject === "math" ? mathBossConfigs : bossConfigs;
+    }
+
+    function getMaxLevelForSubject() {
+      const labels = getSubjectLabels();
+      return Math.max(...labels.visibleLevels);
+    }
+
+    function updateSubjectUi() {
+      const labels = getSubjectLabels();
+      els.appTitle.textContent = labels.title;
+      els.appSubtitle.textContent = labels.subtitle;
+      els.heroName.textContent = labels.heroName;
+      els.bossModeButton.textContent = labels.practiceButton;
+      document.querySelectorAll(".subject-button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.subject === bossBattleState.subject);
+      });
+      document.querySelectorAll(".level-button").forEach((button) => {
+        const level = Number(button.dataset.level);
+        const visible = labels.visibleLevels.includes(level);
+        button.hidden = !visible;
+        button.textContent = labels.levelButtons[level] || `レベル${level}`;
+      });
+      const levelNav = document.querySelector(".level-nav");
+      levelNav.style.gridTemplateColumns = bossBattleState.subject === "math"
+        ? "repeat(2, minmax(150px, 260px))"
+        : "";
+    }
+
+    function switchSubject(subject) {
+      bossBattleState.subject = subject === "math" ? "math" : "english";
+      updateSubjectUi();
+      startBossBattle(1);
+    }
+
     function startBossBattle(level = state.currentLevel || 1) {
       window.clearTimeout(bossBattleState.autoTimer);
       clearBattleEffectTimers();
+      updateSubjectUi();
+      const labels = getSubjectLabels();
+      const safeLevel = labels.visibleLevels.includes(level) ? level : labels.visibleLevels[0];
+      level = safeLevel;
       state.currentLevel = level;
       bossBattleState.round = makeStageRound(level);
       bossBattleState.index = 0;
@@ -4050,7 +4261,8 @@
       document.querySelectorAll(".level-button").forEach((button) => {
         button.classList.toggle("active", Number(button.dataset.level) === level);
       });
-      const config = bossConfigs[level] || bossConfigs[1];
+      const configs = getBossConfigs();
+      const config = configs[level] || configs[1];
       els.levelBadge.textContent = `${config.label}：ステージバトル`;
       els.battleTitle.textContent = `${config.label}：${config.name}`;
       els.battleSubtitle.textContent = config.subtitle;
@@ -4106,7 +4318,8 @@
     }
 
     function pickBossSpecial() {
-      const config = bossConfigs[bossBattleState.selectedLevel || state.currentLevel || 1] || bossConfigs[1];
+      const configs = getBossConfigs();
+      const config = configs[bossBattleState.selectedLevel || state.currentLevel || 1] || configs[1];
       return shuffle(config.specials)[0];
     }
 
@@ -4117,7 +4330,8 @@
     }
 
     function setupBossForLevel() {
-      const config = bossConfigs[bossBattleState.selectedLevel] || bossConfigs[1];
+      const configs = getBossConfigs();
+      const config = configs[bossBattleState.selectedLevel] || configs[1];
       const useEnemyArt = Boolean(config.enemyArt && !bossBattleState.customBossFace);
       els.bossName.textContent = config.name;
       els.bossMonster.className = `boss-monster ${config.className}${bossBattleState.customBossFace ? " custom" : ""}${useEnemyArt ? " has-art" : ""}`;
@@ -4322,7 +4536,7 @@
       els.bossQuestionCounter.textContent = `${bossBattleState.round.length} / ${bossBattleState.round.length} 問`;
       els.bossQuestionBox.classList.add("hidden");
       els.bossRetryButton.classList.remove("hidden");
-      const hasNextLevel = bossBattleState.selectedLevel < 6;
+      const hasNextLevel = bossBattleState.selectedLevel < getMaxLevelForSubject();
       els.bossNextLevelButton.classList.toggle("hidden", !(bossBattleState.score === 5 && hasNextLevel));
       if (bossBattleState.score === 5) {
         playUltimateSuccess();
@@ -4791,6 +5005,10 @@
       button.addEventListener("click", () => startBossBattle(Number(button.dataset.level)));
     });
 
+    document.querySelectorAll(".subject-button").forEach((button) => {
+      button.addEventListener("click", () => switchSubject(button.dataset.subject));
+    });
+
     els.retryLevelButton.addEventListener("click", () => startLevel(state.currentLevel));
     els.nextLevelButton.addEventListener("click", () => {
       const passed = state.score >= 4;
@@ -4798,10 +5016,16 @@
       startLevel(nextLevel, passed ? "レベルアップ！次は少しむずかしくなるよ" : undefined);
     });
 
-    els.bossModeButton.addEventListener("click", () => startLevel(state.currentLevel || 1));
+    els.bossModeButton.addEventListener("click", () => {
+      if (bossBattleState.subject === "math") {
+        startBossBattle(1);
+      } else {
+        startLevel(state.currentLevel || 1);
+      }
+    });
     els.bossRetryButton.addEventListener("click", () => startBossBattle(bossBattleState.selectedLevel));
     els.bossNextLevelButton.addEventListener("click", () => {
-      startBossBattle(Math.min(bossBattleState.selectedLevel + 1, 6));
+      startBossBattle(Math.min(bossBattleState.selectedLevel + 1, getMaxLevelForSubject()));
     });
     els.faceUpload.addEventListener("change", loadHeroFace);
     els.bossFaceUpload.addEventListener("change", loadBossFace);
@@ -4823,6 +5047,7 @@
     window.addEventListener("touchend", stopCropDrag);
     els.cropCanvas.addEventListener("wheel", zoomCropWithWheel, { passive: false });
 
+    updateSubjectUi();
     startBossBattle(1);
   </script>
 </body>
