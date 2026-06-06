@@ -2446,9 +2446,10 @@
         practiceButton: "れんしゅう",
         levelButtons: {
           1: "レベル1：スライム",
-          2: "レベル2：こうもり"
+          2: "レベル2：こうもり",
+          3: "レベル3：ゴーレム"
         },
-        visibleLevels: [1, 2]
+        visibleLevels: [1, 2, 3]
       }
     };
 
@@ -3517,14 +3518,33 @@
       };
     }
 
+    function makeMathSubtractionQuestion(index, level) {
+      const minuend = Math.floor(Math.random() * 10);
+      const subtrahend = Math.floor(Math.random() * (minuend + 1));
+      const answer = minuend - subtrahend;
+      return {
+        id: `math-l${level}-sub-${index}-${minuend}-${subtrahend}`,
+        level,
+        type: "choice",
+        questionText: "ひきざんのこたえをえらぼう",
+        sentenceHtml: `${minuend} - ${subtrahend} = ?`,
+        japaneseMeaning: `${minuend} から ${subtrahend} を とると いくつ？`,
+        choices: makeMathChoices(answer, 9),
+        answer: String(answer),
+        explanation: `${minuend} から ${subtrahend} をとると ${answer} です。`
+      };
+    }
+
     function makeMathStageRound(level) {
-      if (level !== 1 && level !== 2) return [];
+      if (level !== 1 && level !== 2 && level !== 3) return [];
       const seen = new Set();
       const round = [];
       let tries = 0;
       while (round.length < 5 && tries < 80) {
         tries += 1;
-        const question = makeMathAdditionQuestion(round.length + 1, level);
+        const question = level === 3
+          ? makeMathSubtractionQuestion(round.length + 1, level)
+          : makeMathAdditionQuestion(round.length + 1, level);
         const key = question.sentenceHtml;
         if (seen.has(key)) continue;
         seen.add(key);
@@ -3774,6 +3794,16 @@
         { name: "7 + 5 = 12 黒板消しクラッシュ", type: "blackboardEraser" },
         { name: "4 + 9 = 13 給食トレーキャノン", type: "trayCannon" },
         { name: "8 + 8 = 16 ランドセルプッシュ", type: "bagPush" }
+      ],
+      level3: [
+        { name: "8 - 3 = 5 消しゴムローラー", type: "eraserRoller" },
+        { name: "9 - 4 = 5 黒板消しクラッシュ", type: "blackboardEraser" },
+        { name: "7 - 2 = 5 ランドセルプッシュ", type: "bagPush" },
+        { name: "6 - 1 = 5 うわばきダッシュ", type: "shoeDash" },
+        { name: "5 - 5 = 0 ぞうきんスイープ", type: "zokinSweep" },
+        { name: "9 - 0 = 9 給食トレーキャノン", type: "trayCannon" },
+        { name: "4 - 2 = 2 えんぴつロケット", type: "pencilRocket" },
+        { name: "3 - 1 = 2 チョークミサイル", type: "chalkMissile" }
       ]
     };
 
@@ -3795,6 +3825,15 @@
         enemyArt: "assets/enemies/question_bat/enemy_question_bat_normal.png",
         defeatedArt: "assets/enemies/question_bat/enemy_question_bat_defeated.png",
         specials: mathSpecialMoves.level2
+      },
+      3: {
+        name: "ひきざんゴーレム",
+        className: "level-3",
+        label: "レベル3",
+        subtitle: "1けたのひきざんで、ひきざんゴーレムを倒そう！",
+        enemyArt: "assets/enemies/golem/enemy_golem_normal.png",
+        defeatedArt: "assets/enemies/golem/enemy_golem_defeated.png",
+        specials: mathSpecialMoves.level3
       }
     };
 
